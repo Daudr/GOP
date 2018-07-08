@@ -7,7 +7,14 @@
 
 
 class Tabellone {
+    public:
 
+    private:
+        /// Costruttore
+        Tabellone();
+
+        /// Stampa il tabellone in console
+        void print();
 };
 
 

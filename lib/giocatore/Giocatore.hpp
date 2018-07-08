@@ -35,7 +35,7 @@ class Giocatore {
 
         /// Imposta la posizione del giocatore nel tabellone
         /// @param posizione Posizione del giocatore
-        voi setPosizione(int posizione);
+        void setPosizione(int posizione);
 };
 
 

@@ -20,6 +20,13 @@ class Mazzo {
         /// Costruttore
         /// @param carte Carte che compongono il mazzo
         Mazzo(vector<Carta> carte);
+
+        /// Rtorna le carte che compongono il mazzo
+        vector<Carta> getCarte();
+
+        /// Imposta le carte che compongono il mazzo
+        /// @param carte Carte che compongono il mazzo
+        void setCarte(vector<Carta> carte);
 };
 
 

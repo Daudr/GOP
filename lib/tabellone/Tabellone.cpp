@@ -3,3 +3,7 @@
 //
 
 #include "Tabellone.hpp"
+
+Tabellone::Tabellone() {};
+
+void Tabellone::print() {};
