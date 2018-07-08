@@ -17,3 +17,11 @@ std::string Giocatore::getNome() {
 void Giocatore::setNome(std::string nome) {
     this->nome = nome;
 };
+
+int Giocatore::getPosizione() {
+    return this->posizione;
+};
+
+void Giocatore::setPosizione(int posizione) {
+    this->posizione = posizione;
+};

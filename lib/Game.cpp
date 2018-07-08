@@ -18,6 +18,8 @@ Game::Game(int giocatori) {
 
 void Game::startGame() {
     while(!this->gameEnded) {
+        // TODO: Inizializzare tabellone
+        // TODO: Inizializzare mazzo di carte
         // TODO: Aggiungere logica per gestire i turni
     }
 }

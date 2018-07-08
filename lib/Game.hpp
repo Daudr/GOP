@@ -8,13 +8,21 @@
 
 class Game {
     private:
+        /// Numero dei giocatori
         int numeroGiocatori;
+
+        /// Indica se il gioco è finito
         bool gameEnded = false;
 
     public:
+        /// Costruttore di Default
         Game();
+        
+        /// Costruttore di default
+        /// @param giocatori numero di giocatori
         Game(int giocatori);
 
+        /// Fa partire il gioco con il primo turno
         void startGame ();
 
         bool isGameEnded();
