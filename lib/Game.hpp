@@ -10,6 +10,7 @@
 
 #include "giocatore/Giocatore.hpp"
 #include "casella/Casella.hpp"
+#include "carta/Carta.hpp"
 
 using namespace std;
 
@@ -26,6 +27,9 @@ class Game {
 
         /// Array delle caselle che compongono il tabellone
         vector<Casella *> tabellone;
+
+        /// Array delle carte che compongono il mazzo
+        vector<Carta *> mazzo;
 
         /// Indica se il gioco è finito
         bool gameEnded = false;
@@ -83,6 +87,12 @@ class Game {
         /// Imposta l'array delle caselle che compongono l'array del tabellone
         /// @param tabellone Array delle caselle che compongono il tabellone
         void setTabellone(vector<Casella *> tabellone);
+
+        /// Ritorna l'array che compongono il mazzo
+        vector<Carta *> getMazzo();
+
+        /// Imposta l'array delle carte che compongono il mazzo
+        void setMazzo(vector<Carta *> mazzo);
 };
 
 #endif //GOP_GAME_HPP

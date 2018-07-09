@@ -52,7 +52,6 @@ void Game::startGame() {
     this->printTabellone();
 
     while(!this->gameEnded) {
-        // TODO: Inizializzare tabellone
         // TODO: Inizializzare mazzo di carte
         // TODO: Aggiungere logica per gestire i turni
 
@@ -110,6 +109,8 @@ void Game::printGiocatoreCorrente() {
 void Game::initTabellone() {
     int numeroCaselle = rand() % 41 + 60;
 
+    cout << numeroCaselle << endl << endl;
+
     this->tabellone.push_back(new CasellaInizio());
 
     int voidChance = 100;
@@ -152,6 +153,8 @@ void Game::initTabellone() {
             }
         }
     }
+
+    cout << this->tabellone.size() << endl << endl;
 };
 
 void Game::printTabellone() {
@@ -210,3 +213,11 @@ vector<Casella *> Game::getTabellone() {
 void Game::setTabellone(vector<Casella *> tabellone) {
     this->tabellone = tabellone;
 };
+
+vector<Carta *> Game::getMazzo() {
+    return this->mazzo;
+};
+
+void Game::setMazzo(vector<Carta *> mazzo) {
+    this->mazzo = mazzo;
+}

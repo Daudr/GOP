@@ -22,7 +22,7 @@ enum TipoCasella {
 class Casella {
     protected:
         /// Testo della casella
-        string testo;
+        string testo = "Vuota";
 
         /// Tipo della casella;
         TipoCasella tipo = Vuota;
