@@ -6,6 +6,7 @@
 #define GOP_GAME_HPP
 
 #include <vector>
+#include <string>
 
 #include "giocatore/Giocatore.hpp"
 #include "casella/Casella.hpp"
@@ -21,7 +22,7 @@ class Game {
         vector<Giocatore> giocatori;
 
         /// Indice del giocatore corrente
-        int giocatoreCorrente;
+        int giocatoreCorrente = 0;
 
         /// Array delle caselle che compongono il tabellone
         vector<Casella *> tabellone;
@@ -43,15 +44,17 @@ class Game {
         /// Sposta un giocatore
         void spostaGiocatore(int spostamento);
 
-        /// Simula il tiro di due dadi da 6 facce
-        /// @return Risultato del tiro
-        int tiraDadi();
+        /// Simula il tiro di due dadi da 6 facce e lo spostamento del giocatore
+        void tiraDadi();
 
         /// Stampa il nome e la posizione del giocatore corrente;
         void printGiocatoreCorrente();
 
         /// Inizializza le caselle che compongono il tabellone
         void initTabellone();
+
+        /// Stampa il tabellone sulla console
+        void printTabellone();
 
         /// Ritorna l'array del giocatore
         vector<Giocatore> getGiocatori();

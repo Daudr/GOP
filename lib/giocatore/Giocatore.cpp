@@ -6,7 +6,7 @@
 
 #include "Giocatore.hpp"
 
-Giocatore::Giocatore(std::string name) {
+Giocatore::Giocatore(std::string nome) {
     this->nome = nome;
 };
 
@@ -24,4 +24,12 @@ int Giocatore::getPosizione() {
 
 void Giocatore::setPosizione(int posizione) {
     this->posizione = posizione;
+};
+
+int Giocatore::getFermo() {
+    return this->fermo;
+};
+
+void Giocatore::setFermo(int fermo) {
+    this->fermo = fermo;
 };

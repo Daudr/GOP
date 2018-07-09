@@ -15,7 +15,10 @@ class Giocatore {
         string nome;
 
         /// Posizione del giocatore nel tabellone
-        int posizione;
+        int posizione = 0;
+
+        /// Indica quanti turni un giocatore deve stare fermo
+        int fermo = 0;
 
     public:
         /// Costruttore
@@ -36,6 +39,12 @@ class Giocatore {
         /// Imposta la posizione del giocatore nel tabellone
         /// @param posizione Posizione del giocatore
         void setPosizione(int posizione);
+
+        /// Ritorna il numero di turni in cui il giocatore deve stare fermo
+        int getFermo ();
+
+        /// Imposta il numero di turni in cui il giocatore deve stare fermo
+        void setFermo(int fermo);
 };
 
 
