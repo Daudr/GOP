@@ -74,6 +74,9 @@ class Game {
         /// Pesca una carta dal mazzo
         void pescaCarta();
 
+        /// Fa tornare un giocatore alla prima casella
+        void tornaInizio();
+
         /// Ritorna l'array del giocatore
         vector<Giocatore *> getGiocatori();
 

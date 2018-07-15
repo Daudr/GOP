@@ -13,6 +13,7 @@
 #include "casella/perdiTurni/CasellaPerdiTurni.hpp"
 #include "casella/Casella.hpp"
 #include "carte.hpp"
+#include "casella/tornaInizio/CasellaTornaInizio.hpp"
 
 #define N_COLUMNS 3
 #define W_COLUMN 39
@@ -85,6 +86,9 @@ void Game::startGame() {
             case Sposta:
                 this->spostaGiocatori();
                 break;
+            case TornaInizio:
+                this->tornaInizio();
+                break;
         }
 
         // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
@@ -93,8 +97,6 @@ void Game::startGame() {
 
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
-
-        this->endGame();
     }
 };
 
@@ -110,6 +112,11 @@ void Game::endGame() {
 void Game::spostaGiocatore(int spostamento) {
     Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
     int posizioneCorrente = giocatoreCorrente->getPosizione();
+
+    if (posizioneCorrente + spostamento > this->tabellone.size()) {
+        // Torna indietro per la differenza
+        spostamento = (posizioneCorrente + spostamento) - this->tabellone.size();
+    }
 
     giocatoreCorrente->setPosizione(posizioneCorrente + spostamento);
 };
@@ -141,9 +148,7 @@ void Game::tiraDadi() {
     cout << "Il risultato del tiro è "
          << risultato << "." << endl;
 
-    int posizione = giocatoreCorrente->getPosizione();
-
-    giocatoreCorrente->setPosizione(posizione + risultato);
+    this->spostaGiocatore(risultato);
 
     cout << giocatoreCorrente->getNome()
          << " si trova ora alla casella "
@@ -199,8 +204,8 @@ void Game::initTabellone() {
                     this->tabellone.push_back(new CasellaSposta(-(rand() % 5 + 1)));
                 else if (randInt <= 97)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
-                // else
-                // this->tabellone.at(i) = new BackStartSquare();
+                else
+                 this->tabellone.at(i) = new CasellaTornaInizio();
             }
         }
     }
@@ -264,6 +269,12 @@ void Game::pescaCarta() {
     } else {
         cout << "Sbagliata";
     }
+};
+
+void Game::tornaInizio() {
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+
+    giocatoreCorrente->setPosizione(0);
 };
 
 vector<Giocatore *> Game::getGiocatori() {
