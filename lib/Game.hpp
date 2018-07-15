@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+#include "utils.hpp"
+
 #include "giocatore/Giocatore.hpp"
 #include "casella/Casella.hpp"
 #include "carta/Carta.hpp"
@@ -29,7 +31,7 @@ class Game {
         vector<Casella *> tabellone;
 
         /// Array delle carte che compongono il mazzo
-        vector<Carta *> mazzo;
+        vector<Carta> mazzo;
 
         /// Indica se il gioco è finito
         bool gameEnded = false;
@@ -45,6 +47,9 @@ class Game {
         /// Fa partire il gioco con il primo turno
         void startGame ();
 
+        /// Finisce il gioco
+        void endGame ();
+
         /// Sposta un giocatore
         void spostaGiocatore(int spostamento);
 
@@ -59,6 +64,9 @@ class Game {
 
         /// Stampa il tabellone sulla console
         void printTabellone();
+
+        /// Inizializza il mazzo
+        void initMazzo();
 
         /// Ritorna l'array del giocatore
         vector<Giocatore> getGiocatori();
@@ -89,10 +97,10 @@ class Game {
         void setTabellone(vector<Casella *> tabellone);
 
         /// Ritorna l'array che compongono il mazzo
-        vector<Carta *> getMazzo();
+        vector<Carta> getMazzo();
 
         /// Imposta l'array delle carte che compongono il mazzo
-        void setMazzo(vector<Carta *> mazzo);
+        void setMazzo(vector<Carta> mazzo);
 };
 
 #endif //GOP_GAME_HPP

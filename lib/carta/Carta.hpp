@@ -6,6 +6,7 @@
 #define GOP_CARTA_HPP
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -14,10 +15,18 @@ class Carta {
         /// Testo della carta
         string testo;
 
+        /// Opzioni della carta
+        vector<string> opzioni;
+
+        /// Indice della risposta giusta
+        int corretta;
+
     public:
         /// Costruttore
         /// @param testo Testo della carta
-        Carta(string testo);
+        /// @param opzioni Array delle opzioni
+        /// @param corretta Indice della risposta giusta
+        Carta(string testo, vector<string> opzioni, int corretta);
 
         /// Ritorna il testo della carta
         string getTesto();
@@ -25,6 +34,19 @@ class Carta {
         /// Imposta il testo della carta
         /// @param testo Testo della carta
         void setTesto(string testo);
+
+        /// Ritorna le opzioni
+        vector<string> getOpzioni();
+
+        /// Imposta le opzioni
+        /// @param opzioni Le opzioni della carta
+        void setOpzioni(vector<string>);
+
+        /// Ritorna l'indice dell'opzione giusta
+        int getCorretta();
+
+        /// Imposta l'indice dell'opzione giusta
+        void setCorretta(int corretta);
 };
 
 

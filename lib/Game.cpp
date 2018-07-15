@@ -4,13 +4,15 @@
 
 #include <iostream>
 #include <iomanip>
-
+#include <utility>
 #include "Game.hpp"
 #include "casella/inizio/CasellaInizio.hpp"
 #include "casella/fine/CasellaFine.hpp"
 #include "casella/pesca/CasellaPesca.hpp"
 #include "casella/sposta/CasellaSposta.hpp"
 #include "casella/perdiTurni/CasellaPerdiTurni.hpp"
+#include "casella/Casella.hpp"
+#include "carte.hpp"
 
 #define N_COLUMNS 3
 #define W_COLUMN 39
@@ -51,23 +53,37 @@ void Game::startGame() {
 
     this->printTabellone();
 
+    this->initMazzo();
+
     while(!this->gameEnded) {
-        // TODO: Inizializzare mazzo di carte
         // TODO: Aggiungere logica per gestire i turni
 
         this->printGiocatoreCorrente();
 
         this->tiraDadi();
 
+        Giocatore giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+        int posizioneCorrente = giocatoreCorrente.getPosizione() - 1;
+        TipoCasella tipoCasella = this->tabellone.at(posizioneCorrente)->getTipoCasella();
+
+        if (tipoCasella != Vuota) {
+            // TODO: Gestire l'effetto delle carte
+        }
+
         // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
         // successivo a 0
         this->setGiocatoreCorrente(this->giocatoreCorrente < this->numeroGiocatori ? this->giocatoreCorrente++ : 0);
 
         // Aspetta la pressione di un tasto per passare al turno successivo
-        // system("PAUSE");
+        pause();
 
-        this->gameEnded = true;
+        this->endGame();
     }
+};
+
+void Game::endGame() {
+    // TODO: Migliorare la funzione con un messaggio di vittoria
+    this->setGameEnded(true);
 };
 
 void Game::spostaGiocatore(int spostamento) {
@@ -109,8 +125,6 @@ void Game::printGiocatoreCorrente() {
 void Game::initTabellone() {
     int numeroCaselle = rand() % 41 + 60;
 
-    cout << numeroCaselle << endl << endl;
-
     this->tabellone.push_back(new CasellaInizio());
 
     int voidChance = 100;
@@ -126,7 +140,7 @@ void Game::initTabellone() {
      * - Salta un turno:                            10%
      * - Torna alla partenza:                       3%
      */
-    for (int i = 1; i < numeroCaselle - 1; i++) {
+    for (int i = 1; i < numeroCaselle; i++) {
         if (i == numeroCaselle - 1) {
             this->tabellone.push_back(new CasellaFine());
         } else {
@@ -153,8 +167,6 @@ void Game::initTabellone() {
             }
         }
     }
-
-    cout << this->tabellone.size() << endl << endl;
 };
 
 void Game::printTabellone() {
@@ -180,6 +192,16 @@ void Game::printTabellone() {
         }
         cout << endl;
     }
+};
+
+void Game::initMazzo() {
+    int numeroCarte = rand() % 41 + 60;
+
+    for (int i = 0; i < numeroCarte; i++) {
+        int numeroCarta = rand() % CARTE.size();
+
+        this->mazzo.push_back(CARTE.at(numeroCarta));
+    }
 }
 
 vector<Giocatore> Game::getGiocatori() {
@@ -187,7 +209,7 @@ vector<Giocatore> Game::getGiocatori() {
 };
 
 void Game::setGiocatori(vector<Giocatore> giocatori) {
-    this->giocatori = giocatori;
+    this->giocatori = move(giocatori);
 };
 
 int Game::getGiocatoreCorrente() {
@@ -211,13 +233,13 @@ vector<Casella *> Game::getTabellone() {
 };
 
 void Game::setTabellone(vector<Casella *> tabellone) {
-    this->tabellone = tabellone;
+    this->tabellone = move(tabellone);
 };
 
-vector<Carta *> Game::getMazzo() {
+vector<Carta> Game::getMazzo() {
     return this->mazzo;
 };
 
-void Game::setMazzo(vector<Carta *> mazzo) {
-    this->mazzo = mazzo;
-}
+void Game::setMazzo(vector<Carta> mazzo) {
+    this->mazzo = move(mazzo);
+};
