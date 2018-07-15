@@ -58,42 +58,50 @@ void Game::startGame() {
 
     while(!this->gameEnded) {
         // TODO: Aggiungere logica per gestire i turni
+        Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
         this->printGiocatoreCorrente();
 
-        this->tiraDadi();
+        if (giocatoreCorrente->getFermo() == 0) {
 
-        Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
-        int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
-        Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
-        TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
+            this->tiraDadi();
 
-        switch (tipoCasella) {
-            default:
-                break;
-            case Vuota:
-                break;
-            case Fine:
-                this->endGame();
-                break;
-            case PerdiTurni:
-                // TODO: prendere i turni dalla casella
-                giocatoreCorrente->setFermo(0);
-                break;
-            case PescaCarta:
-                this->pescaCarta();
-                break;
-            case Sposta:
-                this->spostaGiocatori();
-                break;
-            case TornaInizio:
-                this->tornaInizio();
-                break;
+            int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
+            Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
+            TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
+
+            switch (tipoCasella) {
+                default:
+                    break;
+                case Vuota:
+                    break;
+                case Fine:
+                    this->endGame();
+                    break;
+                case PerdiTurni:
+                    Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+                    Casella *casella = this->tabellone.at(giocatore->getPosizione());
+                    CasellaPerdiTurni *casellaPerdiTurni = dynamic_cast<CasellaPerdiTurni *>(&casella);
+                    int turni = casellaPerdiTurni->getTurni();
+                    giocatoreCorrente->setFermo(turni);
+                    break;
+                case PescaCarta:
+                    this->pescaCarta();
+                    break;
+                case Sposta:
+                    this->spostaGiocatori();
+                    break;
+                case TornaInizio:
+                    this->tornaInizio();
+                    break;
+            }
+
+            // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
+            // successivo a 0
+            this->setGiocatoreCorrente(this->giocatoreCorrente < this->numeroGiocatori ? this->giocatoreCorrente++ : 0);
+        } else {
+         giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
         }
-
-        // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
-        // successivo a 0
-        this->setGiocatoreCorrente(this->giocatoreCorrente < this->numeroGiocatori ? this->giocatoreCorrente++ : 0);
 
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
