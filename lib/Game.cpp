@@ -26,7 +26,7 @@ Game::Game() {
         cout << "Come si chiama il giocatore " << i + 1 << " : ";
         cin >> nomeGiocatore;
 
-        Giocatore nuovoGiocatore(nomeGiocatore);
+        Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
         this->giocatori.push_back(nuovoGiocatore);
     }
 
@@ -41,7 +41,7 @@ Game::Game(int giocatori) {
         cout << "Come si chiama il giocatore " << i + 1 << " : ";
         cin >> nomeGiocatore;
 
-        Giocatore nuovoGiocatore(nomeGiocatore);
+        Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
         this->giocatori.push_back(nuovoGiocatore);
     }
 
@@ -62,12 +62,29 @@ void Game::startGame() {
 
         this->tiraDadi();
 
-        Giocatore giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
-        int posizioneCorrente = giocatoreCorrente.getPosizione() - 1;
-        TipoCasella tipoCasella = this->tabellone.at(posizioneCorrente)->getTipoCasella();
+        Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+        int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
+        Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
+        TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
 
-        if (tipoCasella != Vuota) {
-            // TODO: Gestire l'effetto delle carte
+        switch (tipoCasella) {
+            default:
+                break;
+            case Vuota:
+                break;
+            case Fine:
+                this->endGame();
+                break;
+            case PerdiTurni:
+                // TODO: prendere i turni dalla casella
+                giocatoreCorrente->setFermo(0);
+                break;
+            case PescaCarta:
+                this->pescaCarta();
+                break;
+            case Sposta:
+                this->spostaGiocatori();
+                break;
         }
 
         // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
@@ -82,21 +99,41 @@ void Game::startGame() {
 };
 
 void Game::endGame() {
-    // TODO: Migliorare la funzione con un messaggio di vittoria
+    Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
+
+    cout << giocatoreCorrente->getNome() << " ha vinto il gioco" << endl << endl;
+    cout << "Grazie per aver giocato!!!" << endl << endl;
+
     this->setGameEnded(true);
 };
 
 void Game::spostaGiocatore(int spostamento) {
-    Giocatore giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
-    int posizioneCorrente = giocatoreCorrente.getPosizione();
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+    int posizioneCorrente = giocatoreCorrente->getPosizione();
 
-    giocatoreCorrente.setPosizione(posizioneCorrente + spostamento);
+    giocatoreCorrente->setPosizione(posizioneCorrente + spostamento);
+};
+
+void Game::spostaGiocatori() {
+    Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
+    int prossimoGiocatore = this->giocatori.size() < this->giocatoreCorrente ? this->getGiocatoreCorrente() + 1 : 0;
+    Giocatore *giocatoreSuccessivo = this->getGiocatori().at(prossimoGiocatore);
+
+    int posizione = giocatoreCorrente->getPosizione();
+    giocatoreCorrente->setPosizione(giocatoreSuccessivo->getPosizione());
+    giocatoreSuccessivo->setPosizione(posizione);
+
+    cout << giocatoreCorrente->getNome()
+         << " si trova ora alla posizione "
+         << giocatoreCorrente->getPosizione()
+         << ", mentre " << giocatoreSuccessivo->getNome()
+         << " si trova alla posizione " << giocatoreSuccessivo->getPosizione() << endl << endl;
 };
 
 void Game::tiraDadi() {
-    Giocatore giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
-    cout << giocatoreCorrente.getNome()
+    cout << giocatoreCorrente->getNome()
          << " tira il dado." << endl;
 
     int risultato = (rand() % 6 + 1) + (rand() % 6 + 1);
@@ -104,21 +141,21 @@ void Game::tiraDadi() {
     cout << "Il risultato del tiro è "
          << risultato << "." << endl;
 
-    int posizione = giocatoreCorrente.getPosizione();
+    int posizione = giocatoreCorrente->getPosizione();
 
-    giocatoreCorrente.setPosizione(posizione + risultato);
+    giocatoreCorrente->setPosizione(posizione + risultato);
 
-    cout << giocatoreCorrente.getNome()
+    cout << giocatoreCorrente->getNome()
          << " si trova ora alla casella "
-         << giocatoreCorrente.getPosizione()
+         << giocatoreCorrente->getPosizione()
          << endl;
 };
 
 void Game::printGiocatoreCorrente() {
     cout << "Tocca a "
-         << this->giocatori.at(this->giocatoreCorrente).getNome()
+         << this->giocatori.at(this->giocatoreCorrente)->getNome()
          << ", che si trova in posizione "
-         << this->giocatori.at(this->giocatoreCorrente).getPosizione()
+         << this->giocatori.at(this->giocatoreCorrente)->getPosizione()
          << "." << endl << endl;
 };
 
@@ -202,13 +239,38 @@ void Game::initMazzo() {
 
         this->mazzo.push_back(CARTE.at(numeroCarta));
     }
-}
+};
 
-vector<Giocatore> Game::getGiocatori() {
+void Game::pescaCarta() {
+    int numeroCarta = rand() % this->tabellone.size();
+    Carta carta = this->mazzo.at(numeroCarta);
+    int opzioneCorretta = carta.getCorretta();
+    int opzioneScelta;
+
+    cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
+
+    cout << carta.getTesto() << endl << endl;
+
+    for (int i = 0; i < carta.getOpzioni().size(); i++) {
+        string opzione = carta.getOpzioni().at(i);
+        cout << i + 1 << "." << opzione << endl;
+    }
+
+    cout << "Seleziona opzione: ";
+    cin >> opzioneScelta;
+
+    if (opzioneCorretta == opzioneScelta) {
+        cout << "Corretta";
+    } else {
+        cout << "Sbagliata";
+    }
+};
+
+vector<Giocatore *> Game::getGiocatori() {
     return this->giocatori;
 };
 
-void Game::setGiocatori(vector<Giocatore> giocatori) {
+void Game::setGiocatori(vector<Giocatore *> giocatori) {
     this->giocatori = move(giocatori);
 };
 

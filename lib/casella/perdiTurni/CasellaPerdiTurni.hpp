@@ -17,6 +17,13 @@ class CasellaPerdiTurni : public Casella {
         /// Costruttore
         /// @param turni Turni in cui il giocatore deve stare fermo;
         CasellaPerdiTurni(int turni);
+
+        /// Ritorna il numero di turni in cui il giocatore deve stare fermo
+        int getTurni();
+
+        /// Imposta il numero di turni in cui il giocatore deve stare fermo
+        /// @param turni Il numero di turni in cui il giocatore deve stare fermo
+        void setTurni(int turni);
 };
 
 

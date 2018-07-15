@@ -22,7 +22,7 @@ class Game {
         int numeroGiocatori;
 
         /// Array di giocatori
-        vector<Giocatore> giocatori;
+        vector<Giocatore *> giocatori;
 
         /// Indice del giocatore corrente
         int giocatoreCorrente = 0;
@@ -53,6 +53,9 @@ class Game {
         /// Sposta un giocatore
         void spostaGiocatore(int spostamento);
 
+        /// Sposta la posizione di due giocatori
+        void spostaGiocatori();
+
         /// Simula il tiro di due dadi da 6 facce e lo spostamento del giocatore
         void tiraDadi();
 
@@ -68,12 +71,15 @@ class Game {
         /// Inizializza il mazzo
         void initMazzo();
 
+        /// Pesca una carta dal mazzo
+        void pescaCarta();
+
         /// Ritorna l'array del giocatore
-        vector<Giocatore> getGiocatori();
+        vector<Giocatore *> getGiocatori();
 
         /// Imposta l'array dei giocatori
         /// @param giocatori Array dei giocaori
-        void setGiocatori(vector<Giocatore> giocatori);
+        void setGiocatori(vector<Giocatore *> giocatori);
 
         /// Ritorna l'indice del giocatore corrente
         int getGiocatoreCorrente();
