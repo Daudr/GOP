@@ -2,50 +2,57 @@
 // Created by michele.da.rin on 08/07/2018.
 //
 
-#ifndef NEWCASELLA_HPP_
-#define NEWCASELLA_HPP_
+#ifndef GOP_CASELLA_HPP
+#define GOP_CASELLA_HPP
 
 #include <string>
+
 using namespace std;
 
 enum TipoCasella {
-	Vuota,
-	Inizio,
-	Fine,
-	Sposta,
-	PescaCarta,
-	PerdiTurni,
-	TornaInizio
+    Vuota,
+    Inizio,
+    Fine,
+    Sposta,
+    PescaCarta,
+    PerdiTurni,
+    TornaInizio
 };
 
-struct casella {
-	int posizione;
-	string testo;
-	TipoCasella tipo;
-	casella *next;
+class Casella {
+    protected:
+        /// Testo della casella
+        string testo = "Vuota";
+
+        /// Tipo della casella;
+        TipoCasella tipo = Vuota;
+
+    public:
+        /// Costuttore di default
+        Casella();
+
+        /// Costruttore
+        /// @param testo Testo della casella
+        /// @param tipo Tipo della casella
+        Casella(string testo, TipoCasella tipo);
+
+        /// Esegue l'azione in una casella speciale
+        void eseguiAzione();
+
+        /// Ritorna il testo della casella
+        string getTesto();
+
+        /// Imposta il testo della casella
+        /// @param testo Testo della casella
+        void setTesto (string testo);
+
+        /// Ritorna il tipo della casella
+        TipoCasella getTipoCasella();
+
+        /// Imposta il tipo della casella
+        /// @param tipo Tipo della casella
+        void setTipoCasella(TipoCasella tipo);
 };
 
-///esegue azione in una casella speciale
-///@param puntatore a casella
-void eseguiAzione(casella *x);
 
-/// Ritorna il testo della casella
-/// @param puntatore a casella
-string getTesto(casella *x);
-
-/// Imposta il testo della casella
-/// @param puntatore a casella
-/// @param testo Testo della casella
-void setTesto(casella *x, string testo);
-
-/// Ritorna il tipo della casella
-/// @param puntatore a casella
-TipoCasella getTipoCasella(casella *x);
-
-/// Imposta il tipo della casella
-/// @param puntatore a casella
-/// @param tipo della casella
-void setTipoCasella(casella *x, TipoCasella tipo);
-
-
-#endif /* NEWCASELLA_HPP_ */
+#endif //GOP_CASELLA_HPP
