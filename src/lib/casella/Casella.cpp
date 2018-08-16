@@ -2,25 +2,32 @@
 // Created by michele.da.rin on 08/07/2018.
 //
 
+
 #include "Casella.hpp"
 
-#include <string>
-using namespace std;
+Casella::Casella() {};
 
-void eseguiAzione(casella *x){};
-
-string getTesto(casella *x){
-	return x->testo;
+Casella::Casella(string testo, TipoCasella tipo) {
+    this->testo = testo;
+    this->tipo = tipo;
 };
 
-void setTesto(casella *x, string testo){
-	x->testo = testo;
+void Casella::eseguiAzione() {};
+
+string Casella::getTesto() {
+    return this->testo;
 };
 
-TipoCasella getTipoCasella(casella *x){
-	return x->tipo;
+void Casella::setTesto(string testo) {
+    this->testo = testo;
 };
 
-void setTipoCasella(casella *x, TipoCasella tipo){
-	x->tipo = tipo;
+TipoCasella Casella::getTipoCasella() {
+    return this->tipo;
 };
+
+void Casella::setTipoCasella(TipoCasella tipo) {
+    this->tipo = tipo;
+};
+
+
