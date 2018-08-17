@@ -1,12 +1,13 @@
 #include <iostream>
 
 #include "lib/Game.hpp"
+#include <time.h>
 
 int main() {
     // Inizializzazione della funzione rand
-    srand((unsigned)time(nullptr));
+    srand(time(nullptr));
 
-    auto game = new Game();
+    auto game = new Game(2);
 
     return 0;
 }

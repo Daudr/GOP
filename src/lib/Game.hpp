@@ -19,7 +19,7 @@ using namespace std;
 class Game {
     private:
         /// Numero dei giocatori
-        int numeroGiocatori;
+        int numeroGiocatori = 0;
 
         /// Array di giocatori
         vector<Giocatore *> giocatori;

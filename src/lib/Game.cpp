@@ -57,14 +57,13 @@ void Game::startGame() {
     this->initMazzo();
 
     while(!this->gameEnded) {
-        // TODO: Aggiungere logica per gestire i turni
         Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
         this->printGiocatoreCorrente();
 
         if (giocatoreCorrente->getFermo() == 0) {
 
-            this->tiraDadi();
+        	this->tiraDadi();
 
             int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
             Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
@@ -76,33 +75,44 @@ void Game::startGame() {
                 case Vuota:
                     break;
                 case Fine:
+                {
                     this->endGame();
                     break;
+                }
                 case PerdiTurni:
-                    Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+                {
+                	//TODO: sistemare questi "crosses initialization".Poi perché dynamic_cast dà bug e static_cast no?
+                	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
                     Casella *casella = this->tabellone.at(giocatore->getPosizione());
-                    CasellaPerdiTurni *casellaPerdiTurni = dynamic_cast<CasellaPerdiTurni *>(&casella);
+                    CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
                     int turni = casellaPerdiTurni->getTurni();
                     giocatoreCorrente->setFermo(turni);
                     break;
+                }
                 case PescaCarta:
+                {
                     this->pescaCarta();
                     break;
+                }
                 case Sposta:
+                {
                     this->spostaGiocatori();
                     break;
+                }
                 case TornaInizio:
+                {
                     this->tornaInizio();
                     break;
-            }
+                }
+              }
 
             // Se il giocatore corrente Ã¨ l'ultimo imposta l'indice del giocatore
             // successivo a 0
-            this->setGiocatoreCorrente(this->giocatoreCorrente < this->numeroGiocatori ? this->giocatoreCorrente++ : 0);
+            this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
+            cout << endl << endl;
         } else {
-         giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
-        }
-
+            giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
+           }
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
     }
@@ -173,6 +183,7 @@ void Game::printGiocatoreCorrente() {
 };
 
 void Game::initTabellone() {
+	//TODO: tabellone NON genera casella "Perdi Turni" (o non la stampa)
     int numeroCaselle = rand() % 41 + 60;
 
     this->tabellone.push_back(new CasellaInizio());
@@ -213,7 +224,8 @@ void Game::initTabellone() {
                 else if (randInt <= 97)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
-                 this->tabellone.at(i) = new CasellaTornaInizio();
+                	//Perché c'era tabellone.at?
+                	this->tabellone.push_back(new CasellaTornaInizio());
             }
         }
     }
@@ -255,28 +267,28 @@ void Game::initMazzo() {
 };
 
 void Game::pescaCarta() {
-    int numeroCarta = rand() % this->tabellone.size();
-    Carta carta = this->mazzo.at(numeroCarta);
-    int opzioneCorretta = carta.getCorretta();
-    int opzioneScelta;
-
-    cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
-
-    cout << carta.getTesto() << endl << endl;
-
-    for (int i = 0; i < carta.getOpzioni().size(); i++) {
-        string opzione = carta.getOpzioni().at(i);
-        cout << i + 1 << "." << opzione << endl;
-    }
-
-    cout << "Seleziona opzione: ";
-    cin >> opzioneScelta;
-
-    if (opzioneCorretta == opzioneScelta) {
-        cout << "Corretta";
-    } else {
-        cout << "Sbagliata";
-    }
+//    int numeroCarta = rand() % this->tabellone.size();
+//    Carta carta = this->mazzo.at(numeroCarta);
+//    int opzioneCorretta = carta.getCorretta();
+//    int opzioneScelta;
+//
+//    cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
+//
+//    cout << carta.getTesto() << endl << endl;
+//
+//    for (int i = 0; i < carta.getOpzioni().size(); i++) {
+//        string opzione = carta.getOpzioni().at(i);
+//        cout << i + 1 << "." << opzione << endl;
+//    }
+//
+//    cout << "Seleziona opzione: ";
+//    cin >> opzioneScelta;
+//
+//    if (opzioneCorretta == opzioneScelta) {
+//        cout << "Corretta";
+//    } else {
+//        cout << "Sbagliata";
+//    }
 };
 
 void Game::tornaInizio() {
