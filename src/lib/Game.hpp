@@ -53,8 +53,8 @@ class Game {
         /// Sposta un giocatore
         void spostaGiocatore(int spostamento);
 
-        /// Sposta la posizione di due giocatori
-        void spostaGiocatori();
+        /// Scambia la posizione di due giocatori
+        void scambiaGiocatori();
 
         /// Simula il tiro di due dadi da 6 facce e lo spostamento del giocatore
         void tiraDadi();

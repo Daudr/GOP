@@ -13,6 +13,7 @@
 #include "casella/perdiTurni/CasellaPerdiTurni.hpp"
 #include "casella/Casella.hpp"
 #include "carte.hpp"
+#include "casella/scambia/CasellaScambia.hpp"
 #include "casella/tornaInizio/CasellaTornaInizio.hpp"
 
 #define N_COLUMNS 3
@@ -50,6 +51,7 @@ Game::Game(int giocatori) {
 };
 
 void Game::startGame() {
+	//TODO: finire implementare le caselle Sposta e Pesca Carta
     this->initTabellone();
 
     this->printTabellone();
@@ -65,7 +67,7 @@ void Game::startGame() {
 
         	this->tiraDadi();
 
-            int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
+            int posizioneCorrente = giocatoreCorrente->getPosizione();
             Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
             TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
 
@@ -81,12 +83,14 @@ void Game::startGame() {
                 }
                 case PerdiTurni:
                 {
-                	//TODO: sistemare questi "crosses initialization".Poi perché dynamic_cast dà bug e static_cast no?
+                	//TODO: Poi perché dynamic_cast dà bug e static_cast no?
                 	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
                     Casella *casella = this->tabellone.at(giocatore->getPosizione());
+                    cout << "Posizione giocatore " << giocatore->getPosizione() << endl;
                     CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
                     int turni = casellaPerdiTurni->getTurni();
                     giocatoreCorrente->setFermo(turni);
+                    cout << "Ops! " << "E' una casella Perdi Turni! Fermo per: " << turni << " turni" << endl;
                     break;
                 }
                 case PescaCarta:
@@ -94,10 +98,15 @@ void Game::startGame() {
                     this->pescaCarta();
                     break;
                 }
+                case Scambia:
+                {
+                    this->scambiaGiocatori();
+                    break;
+                }
                 case Sposta:
                 {
-                    this->spostaGiocatori();
-                    break;
+                	this->spostaGiocatore(1);
+                	break;
                 }
                 case TornaInizio:
                 {
@@ -106,12 +115,14 @@ void Game::startGame() {
                 }
               }
 
-            // Se il giocatore corrente Ã¨ l'ultimo imposta l'indice del giocatore
+            // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
             cout << endl << endl;
         } else {
+        	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl;
             giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
+            this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);	//Giocatore successivo
            }
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
@@ -119,6 +130,7 @@ void Game::startGame() {
 };
 
 void Game::endGame() {
+	//TODO: BUG - spesso invece che fermarsi il giocatore va oltre la fine e il programma restituisce errore Out of Range
     Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
 
     cout << giocatoreCorrente->getNome() << " ha vinto il gioco" << endl << endl;
@@ -139,9 +151,13 @@ void Game::spostaGiocatore(int spostamento) {
     giocatoreCorrente->setPosizione(posizioneCorrente + spostamento);
 };
 
-void Game::spostaGiocatori() {
+void Game::scambiaGiocatori() {
     Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
-    int prossimoGiocatore = this->giocatori.size() < this->giocatoreCorrente ? this->getGiocatoreCorrente() + 1 : 0;
+    int prossimoGiocatore = (this->giocatoreCorrente + (rand()%(this->numeroGiocatori - 1) + 1))%(this->numeroGiocatori);
+    //Viene scelto a caso uno degli altri giocatori.
+    //-1 e +1 assicurano che non velga scelto di nuovo il giocatore corrente
+    //Esempio: 5 giocatori, 2 giocatoreCorrente. Per -1 ho random un numero tra 0 e 3,
+    //per +1 il random diventa tra 1 e 4, dunque prossimoGiocatore è random tra {3,4,0,1}
     Giocatore *giocatoreSuccessivo = this->getGiocatori().at(prossimoGiocatore);
 
     int posizione = giocatoreCorrente->getPosizione();
@@ -183,7 +199,6 @@ void Game::printGiocatoreCorrente() {
 };
 
 void Game::initTabellone() {
-	//TODO: tabellone NON genera casella "Perdi Turni" (o non la stampa)
     int numeroCaselle = rand() % 41 + 60;
 
     this->tabellone.push_back(new CasellaInizio());
@@ -195,10 +210,11 @@ void Game::initTabellone() {
     /* ProbabilitÃ  in percentuali:
      * - Vuota:                                     100% -> 70% -> 40% -> 10% -> 0%
      * Se non viene la casella vuota:
-     * - Pesca una carta:                           45%
+     * - Pesca una carta:                           35%
      * - Muovi giocatore avanti da 1 a 6 caselle:   21%
      * - Muovi gioatore indietro da 1 a 6 caselle:  21%
-     * - Salta un turno:                            10%
+     * - Scambia giocatore con un altro casuale:    10%
+     * - Perdi da 1 a 3 turni:                      10%
      * - Torna alla partenza:                       3%
      */
     for (int i = 1; i < numeroCaselle; i++) {
@@ -215,16 +231,18 @@ void Game::initTabellone() {
 
                 randInt = rand() % 100 + 1;
 
-                if (randInt <= 45)
+                if (randInt <= 35)
                     this->tabellone.push_back(new CasellaPesca());
-                else if (randInt <= 66)
+                else if (randInt <= 56)
                     this->tabellone.push_back(new CasellaSposta(rand() % 5 + 1));
-                else if (randInt <= 87)
+                else if (randInt <= 77)
                     this->tabellone.push_back(new CasellaSposta(-(rand() % 5 + 1)));
+                else if (randInt <= 87)
+                	this->tabellone.push_back(new CasellaScambia());
                 else if (randInt <= 97)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
-                	//Perché c'era tabellone.at?
+                	//TODO: Perché c'era tabellone.at?
                 	this->tabellone.push_back(new CasellaTornaInizio());
             }
         }
@@ -232,7 +250,6 @@ void Game::initTabellone() {
 };
 
 void Game::printTabellone() {
-
     int r = (this->tabellone.size() % N_COLUMNS == 0) ? 0 : 1;
     int n = this->tabellone.size() / N_COLUMNS + r;
 

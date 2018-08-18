@@ -16,7 +16,8 @@ enum TipoCasella {
     Sposta,
     PescaCarta,
     PerdiTurni,
-    TornaInizio
+    TornaInizio,
+	Scambia
 };
 
 class Casella {

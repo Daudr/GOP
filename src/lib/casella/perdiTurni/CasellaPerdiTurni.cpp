@@ -4,8 +4,8 @@
 
 #include "CasellaPerdiTurni.hpp"
 
-CasellaPerdiTurni::CasellaPerdiTurni(int turni) {
-    // int turni = rand() % 0 + 3;
+CasellaPerdiTurni::CasellaPerdiTurni(int turni) : Casella("Perdi Turni", PerdiTurni) {
+    this->turni = turni;
 };
 
 int CasellaPerdiTurni::getTurni() {
