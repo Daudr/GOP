@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <vector>
 #include <iomanip>
 #include <utility>
 #include "Game.hpp"
@@ -274,12 +275,16 @@ void Game::printTabellone() {
 };
 
 void Game::initMazzo() {
-    int numeroCarte = rand() % 41 + 60;
+	//TODO: fissare il mazzo a 40 carte va bene?
+	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
+//    int numeroCarte = rand() % 41 + 60;
+	int numeroCarte = 40;
 
     for (int i = 0; i < numeroCarte; i++) {
-        int numeroCarta = rand() % CARTE.size();
+        int numeroCarta = rand() % (CARTE.size() - i);
 
         this->mazzo.push_back(CARTE.at(numeroCarta));
+        CARTE.erase(CARTE.begin() + numeroCarta);
     }
 };
 
