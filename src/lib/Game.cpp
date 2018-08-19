@@ -87,11 +87,10 @@ void Game::startGame() {
                 	//TODO: Poi perché dynamic_cast dà bug e static_cast no?
                 	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
                     Casella *casella = this->tabellone.at(giocatore->getPosizione());
-                    cout << "Posizione giocatore " << giocatore->getPosizione() << endl;
                     CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
                     int turni = casellaPerdiTurni->getTurni();
                     giocatoreCorrente->setFermo(turni);
-                    cout << "Ops! " << "E' una casella Perdi Turni! Fermo per: " << turni << " turni" << endl;
+                    cout << "Ops! E' una casella Perdi Turni! Fermo per: " << turni << " turni" << endl;
                     break;
                 }
                 case PescaCarta:
@@ -106,7 +105,13 @@ void Game::startGame() {
                 }
                 case Sposta:
                 {
-                	this->spostaGiocatore(1);
+                	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+                	Casella *casella = this->tabellone.at(giocatore->getPosizione());
+                	CasellaSposta *casellaSposta = static_cast<CasellaSposta *>(casella);
+                	int spostamento = casellaSposta->getSpostamento();
+                	this->spostaGiocatore(spostamento);
+                	cout << "Casella spostamento! " << giocatoreCorrente->getNome()
+                			<< " si trova ora alla casella " << giocatoreCorrente->getPosizione();
                 	break;
                 }
                 case TornaInizio:
@@ -275,13 +280,13 @@ void Game::printTabellone() {
 };
 
 void Game::initMazzo() {
-	//TODO: fissare il mazzo a 40 carte va bene?
+	//TODO: fissato il numero di carte con il numero delle domande inserite
 	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
 //    int numeroCarte = rand() % 41 + 60;
-	int numeroCarte = 40;
+	int numeroCarte = CARTE.size();
 
     for (int i = 0; i < numeroCarte; i++) {
-        int numeroCarta = rand() % (CARTE.size() - i);
+        int numeroCarta = rand() % (CARTE.size());
 
         this->mazzo.push_back(CARTE.at(numeroCarta));
         CARTE.erase(CARTE.begin() + numeroCarta);
@@ -289,6 +294,7 @@ void Game::initMazzo() {
 };
 
 void Game::pescaCarta() {
+	//TODO: Gestire mazzo, carte, pescaCarta etc...
 //    int numeroCarta = rand() % this->tabellone.size();
 //    Carta carta = this->mazzo.at(numeroCarta);
 //    int opzioneCorretta = carta.getCorretta();
