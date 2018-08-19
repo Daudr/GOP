@@ -111,7 +111,7 @@ void Game::startGame() {
                 	int spostamento = casellaSposta->getSpostamento();
                 	this->spostaGiocatore(spostamento);
                 	cout << "Casella spostamento! " << giocatoreCorrente->getNome()
-                			<< " si trova ora alla casella " << giocatoreCorrente->getPosizione();
+                			<< " si trova ora alla casella " << giocatoreCorrente->getPosizione() << endl;
                 	break;
                 }
                 case TornaInizio:
@@ -217,11 +217,11 @@ void Game::initTabellone() {
      * - Vuota:                                     100% -> 70% -> 40% -> 10% -> 0%
      * Se non viene la casella vuota:
      * - Pesca una carta:                           35%
-     * - Muovi giocatore avanti da 1 a 6 caselle:   21%
-     * - Muovi gioatore indietro da 1 a 6 caselle:  21%
+     * - Muovi giocatore avanti da 1 a 6 caselle:   20%
+     * - Muovi gioatore indietro da 1 a 6 caselle:  20%
      * - Scambia giocatore con un altro casuale:    10%
      * - Perdi da 1 a 3 turni:                      10%
-     * - Torna alla partenza:                       3%
+     * - Torna alla partenza:                       5%
      */
     for (int i = 1; i < numeroCaselle; i++) {
         if (i == numeroCaselle - 1) {
@@ -239,13 +239,13 @@ void Game::initTabellone() {
 
                 if (randInt <= 35)
                     this->tabellone.push_back(new CasellaPesca());
-                else if (randInt <= 56)
+                else if (randInt <= 55)
                     this->tabellone.push_back(new CasellaSposta(rand() % 5 + 1));
-                else if (randInt <= 77)
+                else if (randInt <= 75)
                     this->tabellone.push_back(new CasellaSposta(-(rand() % 5 + 1)));
-                else if (randInt <= 87)
+                else if (randInt <= 85)
                 	this->tabellone.push_back(new CasellaScambia());
-                else if (randInt <= 97)
+                else if (randInt <= 95)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
                 	//TODO: Perché c'era tabellone.at?
@@ -323,6 +323,7 @@ void Game::tornaInizio() {
     Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
     giocatoreCorrente->setPosizione(0);
+    cout << giocatoreCorrente->getNome() << " torna al punto di partenza! Nuova posizione: 0" << endl;
 };
 
 vector<Giocatore *> Game::getGiocatori() {
