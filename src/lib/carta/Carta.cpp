@@ -4,6 +4,12 @@
 
 #include "Carta.hpp"
 
+Carta::Carta(){
+	this->testo = " ";
+	this->opzioni = {};
+	this->corretta = 0;
+}
+
 Carta::Carta(string testo, vector<string> opzioni, int corretta) {
     this->testo = testo;
     this->opzioni = opzioni;

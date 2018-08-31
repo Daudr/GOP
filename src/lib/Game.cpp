@@ -52,7 +52,7 @@ Game::Game(int giocatori) {
 };
 
 void Game::startGame() {
-	//TODO: finire implementare le caselle Sposta e Pesca Carta
+	//TODO: finire implementare casella Pesca Carta
     this->initTabellone();
 
     this->printTabellone();
@@ -136,7 +136,6 @@ void Game::startGame() {
 };
 
 void Game::endGame() {
-	//TODO: BUG - spesso invece che fermarsi il giocatore va oltre la fine e il programma restituisce errore Out of Range
     Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
 
     cout << giocatoreCorrente->getNome() << " ha vinto il gioco" << endl << endl;
@@ -189,6 +188,11 @@ void Game::tiraDadi() {
          << risultato << "." << endl;
 
     this->spostaGiocatore(risultato);
+    ///Controllo che il giocatore abbia raggiunto la fine del tabellone
+    if (giocatoreCorrente->getPosizione() >= tabellone.size()){
+    	int diff = giocatoreCorrente->getPosizione() - tabellone.size() + 1;
+    	giocatoreCorrente->setPosizione(giocatoreCorrente->getPosizione() - diff);
+    }
 
     cout << giocatoreCorrente->getNome()
          << " si trova ora alla casella "
@@ -283,40 +287,52 @@ void Game::initMazzo() {
 	//TODO: fissato il numero di carte con il numero delle domande inserite
 	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
 //    int numeroCarte = rand() % 41 + 60;
-	int numeroCarte = CARTE.size();
-
-    for (int i = 0; i < numeroCarte; i++) {
-        int numeroCarta = rand() % (CARTE.size());
-
-        this->mazzo.push_back(CARTE.at(numeroCarta));
+	this->mazzo = new Mazzo;
+	/// tmp_head segna dove inizia la creazione del mazzo, così poi da potercisi
+	/// riattaccare alla fine e creare un lista circolare
+    Mazzo* tmp_head = this->mazzo;
+	int numeroCarta = rand() % (CARTE.size());
+	Carta carta = CARTE.at(numeroCarta);
+	this->mazzo->carta = carta;
+	CARTE.erase(CARTE.begin() + numeroCarta);
+    for (int i = 0; i < CARTE.size();) {
+    	this->mazzo->next = new Mazzo;
+    	this->mazzo = this->mazzo->next;
+        numeroCarta = rand() % (CARTE.size());
+        carta = CARTE.at(numeroCarta);
+        this->mazzo->carta = carta;
         CARTE.erase(CARTE.begin() + numeroCarta);
     }
+    this->mazzo->next = tmp_head;
 };
 
 void Game::pescaCarta() {
 	//TODO: Gestire mazzo, carte, pescaCarta etc...
 //    int numeroCarta = rand() % this->tabellone.size();
 //    Carta carta = this->mazzo.at(numeroCarta);
-//    int opzioneCorretta = carta.getCorretta();
-//    int opzioneScelta;
-//
-//    cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
-//
-//    cout << carta.getTesto() << endl << endl;
-//
-//    for (int i = 0; i < carta.getOpzioni().size(); i++) {
-//        string opzione = carta.getOpzioni().at(i);
-//        cout << i + 1 << "." << opzione << endl;
-//    }
-//
-//    cout << "Seleziona opzione: ";
-//    cin >> opzioneScelta;
-//
-//    if (opzioneCorretta == opzioneScelta) {
-//        cout << "Corretta";
-//    } else {
-//        cout << "Sbagliata";
-//    }
+    int opzioneCorretta = this->mazzo->carta.getCorretta();
+    int opzioneScelta;
+    cout << "TEST: " << opzioneCorretta << endl;
+
+
+    cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
+    cout << this->mazzo->carta.getTesto() << endl;
+
+    for (int i = 0; i < 5; i++) {
+        string opzione = this->mazzo->carta.getOpzioni().at(i);
+        cout << i + 1 << ". " << opzione << endl;
+    }
+
+    cout << "Seleziona opzione: ";
+    cin >> opzioneScelta;
+    opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
+
+    if (opzioneCorretta == opzioneScelta) {
+        cout << "Corretta";
+    } else {
+        cout << "Sbagliata";
+    }
+    this->mazzo = this->mazzo->next;
 };
 
 void Game::tornaInizio() {
@@ -358,10 +374,13 @@ void Game::setTabellone(vector<Casella *> tabellone) {
     this->tabellone = move(tabellone);
 };
 
-vector<Carta> Game::getMazzo() {
-    return this->mazzo;
-};
+//TODO: sistemare maybe
+//vector<Carta> Game::getMazzo() {
+//    return this->mazzo;
+//};
 
-void Game::setMazzo(vector<Carta> mazzo) {
-    this->mazzo = move(mazzo);
-};
+
+//TODO: sistemare maybe
+//void Game::setMazzo(vector<Carta> mazzo) {
+//    this->mazzo = move(mazzo);
+//};

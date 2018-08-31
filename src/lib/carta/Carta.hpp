@@ -22,6 +22,8 @@ class Carta {
         int corretta;
 
     public:
+        Carta();
+
         /// Costruttore
         /// @param testo Testo della carta
         /// @param opzioni Array delle opzioni

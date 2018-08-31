@@ -16,6 +16,11 @@
 
 using namespace std;
 
+struct Mazzo {
+	Carta carta = Carta();
+	Mazzo* next;
+};
+
 class Game {
     private:
         /// Numero dei giocatori
@@ -30,8 +35,8 @@ class Game {
         /// Array delle caselle che compongono il tabellone
         vector<Casella *> tabellone;
 
-        /// Array delle carte che compongono il mazzo
-        vector<Carta> mazzo;
+        /// Puntatore alla lista delle carte che compongono il mazzo
+        Mazzo* mazzo = NULL;
 
         /// Indica se il gioco è finito
         bool gameEnded = false;
@@ -109,7 +114,7 @@ class Game {
         vector<Carta> getMazzo();
 
         /// Imposta l'array delle carte che compongono il mazzo
-        void setMazzo(vector<Carta> mazzo);
+        void setMazzo(Mazzo* pointer);
 };
 
 #endif //GOP_GAME_HPP
