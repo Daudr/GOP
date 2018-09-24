@@ -126,7 +126,7 @@ void Game::startGame() {
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
             cout << endl << endl;
         } else {
-        	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl;
+        	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl << endl;
             giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);	//Giocatore successivo
            }
@@ -312,8 +312,7 @@ void Game::pescaCarta() {
 //    Carta carta = this->mazzo.at(numeroCarta);
     int opzioneCorretta = this->mazzo->carta.getCorretta();
     int opzioneScelta;
-    cout << "TEST: " << opzioneCorretta << endl;
-
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
     cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
     cout << this->mazzo->carta.getTesto() << endl;
@@ -327,10 +326,22 @@ void Game::pescaCarta() {
     cin >> opzioneScelta;
     opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
+    ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
     if (opzioneCorretta == opzioneScelta) {
-        cout << "Corretta";
+        cout << "Corretta. Avanzi di 2 caselle!" << endl;
+        spostaGiocatore(2);
+        cout << giocatoreCorrente->getNome()
+                 << " si trova ora alla casella "
+                 << giocatoreCorrente->getPosizione()
+                 << endl;
+
     } else {
-        cout << "Sbagliata";
+        cout << "Sbagliata. Torni indietro di 3 caselle.." << endl;
+        spostaGiocatore(-3);
+        cout << giocatoreCorrente->getNome()
+                 << " si trova ora alla casella "
+                 << giocatoreCorrente->getPosizione()
+                 << endl;
     }
     this->mazzo = this->mazzo->next;
 };
