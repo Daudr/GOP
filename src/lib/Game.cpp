@@ -2,17 +2,29 @@
 // Created by michele.da.rin on 07/07/2018.
 //
 
+//TODO: finire di implementare PescaCarta_Bis
+//TODO: cambiare nomi da mazzo/mazzo_bis a mazzo_blu/mazzo_rosso
+//TODO: cambiare scritte per le caselle e carte speciale in modo che non risulti più "casella" in stampa
+//TODO: finire di aggiugnere domande
+//TODO: aggiungere stampa del tabellone a ogni fine turno
+//TODO: - BUG - Se giocatore torna indietro all'inizio finisce alla fine del tabellone. Es: 4 -> spostamento -6 -> penultima casella
+//TODO: - SOLUZIONE BUG (da implementare) - mettere if di controllo in funzione spostaGiocatore
+
 #include <iostream>
+#include <vector>
 #include <iomanip>
 #include <utility>
 #include "Game.hpp"
 #include "casella/inizio/CasellaInizio.hpp"
 #include "casella/fine/CasellaFine.hpp"
 #include "casella/pesca/CasellaPesca.hpp"
+#include "casella/pesca_rosso/CasellaPesca_Rosso.hpp"
 #include "casella/sposta/CasellaSposta.hpp"
 #include "casella/perdiTurni/CasellaPerdiTurni.hpp"
 #include "casella/Casella.hpp"
 #include "carte.hpp"
+#include "carte_rosso.hpp"
+#include "casella/scambia/CasellaScambia.hpp"
 #include "casella/tornaInizio/CasellaTornaInizio.hpp"
 
 #define N_COLUMNS 3
@@ -55,18 +67,18 @@ void Game::startGame() {
     this->printTabellone();
 
     this->initMazzo();
+    this->initMazzo_Rosso();
 
     while(!this->gameEnded) {
-        // TODO: Aggiungere logica per gestire i turni
         Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
         this->printGiocatoreCorrente();
 
         if (giocatoreCorrente->getFermo() == 0) {
 
-            this->tiraDadi();
+        	this->tiraDadi();
 
-            int posizioneCorrente = giocatoreCorrente->getPosizione() - 1;
+            int posizioneCorrente = giocatoreCorrente->getPosizione();
             Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
             TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
 
@@ -76,33 +88,52 @@ void Game::startGame() {
                 case Vuota:
                     break;
                 case Fine:
+                {
                     this->endGame();
                     break;
+                }
                 case PerdiTurni:
-                    Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
-                    Casella *casella = this->tabellone.at(giocatore->getPosizione());
-                    CasellaPerdiTurni *casellaPerdiTurni = dynamic_cast<CasellaPerdiTurni *>(&casella);
-                    int turni = casellaPerdiTurni->getTurni();
-                    giocatoreCorrente->setFermo(turni);
-                    break;
+                {
+
+                	this->perdiTurni();
+                	break;
+                }
                 case PescaCarta:
+                {
                     this->pescaCarta();
                     break;
-                case Sposta:
-                    this->spostaGiocatori();
+                }
+                case PescaCarta_Rosso:
+                {
+                	this->pescaCarta_rosso();
+                	break;
+                }
+                case Scambia:
+                {
+                    this->scambiaGiocatori();
                     break;
+                }
+                case Sposta:
+                {
+                	this->sposta();
+                	break;
+                }
                 case TornaInizio:
+                {
                     this->tornaInizio();
                     break;
-            }
+                }
+              }
 
-            // Se il giocatore corrente Ã¨ l'ultimo imposta l'indice del giocatore
+            // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
-            this->setGiocatoreCorrente(this->giocatoreCorrente < this->numeroGiocatori ? this->giocatoreCorrente++ : 0);
+            this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
+            cout << endl << endl;
         } else {
-         giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
-        }
-
+        	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl << endl;
+            giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
+            this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);	//Giocatore successivo
+           }
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
     }
@@ -129,9 +160,61 @@ void Game::spostaGiocatore(int spostamento) {
     giocatoreCorrente->setPosizione(posizioneCorrente + spostamento);
 };
 
-void Game::spostaGiocatori() {
+void Game::tiraDadi() {
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+
+    cout << giocatoreCorrente->getNome()
+         << " tira il dado." << endl;
+
+    int risultato = (rand() % 6 + 1) + (rand() % 6 + 1);
+
+    cout << "Il risultato del tiro e' "
+         << risultato << "." << endl;
+
+    this->spostaGiocatore(risultato);
+    ///Controllo che il giocatore abbia raggiunto la fine del tabellone
+    if (giocatoreCorrente->getPosizione() >= tabellone.size()){
+    	int diff = giocatoreCorrente->getPosizione() - tabellone.size() + 1;
+    	giocatoreCorrente->setPosizione(giocatoreCorrente->getPosizione() - diff);
+    }
+
+    cout << giocatoreCorrente->getNome()
+         << " si trova ora alla casella "
+         << giocatoreCorrente->getPosizione()
+         << endl;
+};
+
+int Game::tiraDado_nospost(){
+	Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+
+	cout << giocatoreCorrente->getNome()
+	         << " tira un dado." << endl;
+
+	int risultato = (rand() % 6) + 1;
+
+	cout << "Il risultato del tiro è "
+	         << risultato << "." << endl;
+
+	return risultato;
+}
+
+void Game::sposta(){
+	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+	Casella *casella = this->tabellone.at(giocatore->getPosizione());
+	CasellaSposta *casellaSposta = static_cast<CasellaSposta *>(casella);
+	int spostamento = casellaSposta->getSpostamento();
+	this->spostaGiocatore(spostamento);
+	cout << "Casella spostamento! " << giocatore->getNome()
+	     << " si trova ora alla casella " << giocatore->getPosizione() << endl;
+}
+
+void Game::scambiaGiocatori() {
     Giocatore *giocatoreCorrente = this->getGiocatori().at(this->getGiocatoreCorrente());
-    int prossimoGiocatore = this->giocatori.size() < this->giocatoreCorrente ? this->getGiocatoreCorrente() + 1 : 0;
+    int prossimoGiocatore = (this->giocatoreCorrente + (rand()%(this->numeroGiocatori - 1) + 1))%(this->numeroGiocatori);
+    //Viene scelto a caso uno degli altri giocatori.
+    //-1 e +1 assicurano che non velga scelto di nuovo il giocatore corrente
+    //Esempio: 5 giocatori, 2 giocatoreCorrente. Per -1 ho random un numero tra 0 e 3,
+    //per +1 il random diventa tra 1 e 4, dunque prossimoGiocatore è random tra {3,4,0,1}
     Giocatore *giocatoreSuccessivo = this->getGiocatori().at(prossimoGiocatore);
 
     int posizione = giocatoreCorrente->getPosizione();
@@ -145,24 +228,25 @@ void Game::spostaGiocatori() {
          << " si trova alla posizione " << giocatoreSuccessivo->getPosizione() << endl << endl;
 };
 
-void Game::tiraDadi() {
-    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+void Game::perdiTurni(){
+	//TODO: Poi perché dynamic_cast dà bug e static_cast no?
+	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+	Casella *casella = this->tabellone.at(giocatore->getPosizione());
+	CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
+	int turni = casellaPerdiTurni->getTurni();
+	giocatore->setFermo(turni);
+	cout << "Ops! E' una casella Perdi Turni! Fermo per: " << turni << " turni" << endl;
+}
 
-    cout << giocatoreCorrente->getNome()
-         << " tira il dado." << endl;
-
-    int risultato = (rand() % 6 + 1) + (rand() % 6 + 1);
-
-    cout << "Il risultato del tiro Ã¨ "
-         << risultato << "." << endl;
-
-    this->spostaGiocatore(risultato);
-
-    cout << giocatoreCorrente->getNome()
-         << " si trova ora alla casella "
-         << giocatoreCorrente->getPosizione()
-         << endl;
-};
+void Game::DadoMagico(){
+	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
+	Casella *casella = this->tabellone.at(giocatore->getPosizione());
+	CasellaSposta *casellaSposta = static_cast<CasellaSposta *>(casella);
+	int spostamento = casellaSposta->getSpostamento();
+	this->spostaGiocatore(spostamento);
+	cout << "Hai pescato un dado magico! " << giocatore->getNome()
+		 << " si trova ora alla casella " << giocatore->getPosizione() << endl;
+}
 
 void Game::printGiocatoreCorrente() {
     cout << "Tocca a "
@@ -184,11 +268,13 @@ void Game::initTabellone() {
     /* ProbabilitÃ  in percentuali:
      * - Vuota:                                     100% -> 70% -> 40% -> 10% -> 0%
      * Se non viene la casella vuota:
-     * - Pesca una carta:                           45%
-     * - Muovi giocatore avanti da 1 a 6 caselle:   21%
-     * - Muovi gioatore indietro da 1 a 6 caselle:  21%
-     * - Salta un turno:                            10%
-     * - Torna alla partenza:                       3%
+     * - Pesca una carta da mazzo blu:              20%
+     * - Pesca una carta da mazzo rosso:			20%
+     * - Muovi giocatore avanti da 1 a 6 caselle:   20%
+     * - Muovi gioatore indietro da 1 a 6 caselle:  20%
+     * - Scambia giocatore con un altro casuale:    8%
+     * - Perdi da 1 a 3 turni:                      7%
+     * - Torna alla partenza:                       5%
      */
     for (int i = 1; i < numeroCaselle; i++) {
         if (i == numeroCaselle - 1) {
@@ -204,23 +290,27 @@ void Game::initTabellone() {
 
                 randInt = rand() % 100 + 1;
 
-                if (randInt <= 45)
-                    this->tabellone.push_back(new CasellaPesca());
-                else if (randInt <= 66)
+                if (randInt <= 20)
+                  this->tabellone.push_back(new CasellaPesca());
+                else if (randInt <= 40)
+                	this->tabellone.push_back(new CasellaPesca_Rosso());
+                else if (randInt <= 60)
                     this->tabellone.push_back(new CasellaSposta(rand() % 5 + 1));
-                else if (randInt <= 87)
+                else if (randInt <= 80)
                     this->tabellone.push_back(new CasellaSposta(-(rand() % 5 + 1)));
-                else if (randInt <= 97)
+                else if (randInt <= 88)
+                	this->tabellone.push_back(new CasellaScambia());
+                else if (randInt <= 95)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
-                 this->tabellone.at(i) = new CasellaTornaInizio();
+                	//TODO: Perché c'era tabellone.at?
+                	this->tabellone.push_back(new CasellaTornaInizio());
             }
         }
     }
 };
 
 void Game::printTabellone() {
-
     int r = (this->tabellone.size() % N_COLUMNS == 0) ? 0 : 1;
     int n = this->tabellone.size() / N_COLUMNS + r;
 
@@ -245,44 +335,134 @@ void Game::printTabellone() {
 };
 
 void Game::initMazzo() {
-    int numeroCarte = rand() % 41 + 60;
-
-    for (int i = 0; i < numeroCarte; i++) {
-        int numeroCarta = rand() % CARTE.size();
-
-        this->mazzo.push_back(CARTE.at(numeroCarta));
+	//TODO: fissato il numero di carte con il numero delle domande inserite
+	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
+//    int numeroCarte = rand() % 41 + 60;
+	this->mazzo = new Mazzo;
+	/// tmp_head segna dove inizia la creazione del mazzo, così poi da potercisi
+	/// riattaccare alla fine e creare un lista circolare
+    Mazzo* tmp_head = this->mazzo;
+	int numeroCarta = rand() % (CARTE.size());
+	Carta carta = CARTE.at(numeroCarta);
+	this->mazzo->carta = carta;
+	CARTE.erase(CARTE.begin() + numeroCarta);
+    for (int i = 0; i < CARTE.size();) {
+    	this->mazzo->next = new Mazzo;
+    	this->mazzo = this->mazzo->next;
+        numeroCarta = rand() % (CARTE.size());
+        carta = CARTE.at(numeroCarta);
+        this->mazzo->carta = carta;
+        CARTE.erase(CARTE.begin() + numeroCarta);
     }
+    this->mazzo->next = tmp_head;
 };
 
+void Game::initMazzo_Rosso() {
+	this->mazzo_rosso = new Mazzo;
+    Mazzo* tmp_head = this->mazzo_rosso;
+	int numeroCarta = rand() % 5;
+	Carta carta = CARTE_ROSSO.at(numeroCarta);
+	this->mazzo_rosso->carta = carta;
+    for (int i = 0; i < 40; i++) {
+    	this->mazzo_rosso->next = new Mazzo;
+    	this->mazzo_rosso = this->mazzo_rosso->next;
+        carta = CARTE_ROSSO.at(numeroCarta);
+        this->mazzo_rosso->carta = carta;
+    }
+    this->mazzo_rosso->next = tmp_head;
+};
+
+
+
 void Game::pescaCarta() {
-    int numeroCarta = rand() % this->tabellone.size();
-    Carta carta = this->mazzo.at(numeroCarta);
-    int opzioneCorretta = carta.getCorretta();
+//    int numeroCarta = rand() % this->tabellone.size();
+//    Carta carta = this->mazzo.at(numeroCarta);
+    int opzioneCorretta = this->mazzo->carta.getCorretta();
     int opzioneScelta;
+    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
     cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta: " << endl << endl;
+    cout << this->mazzo->carta.getTesto() << endl;
 
-    cout << carta.getTesto() << endl << endl;
-
-    for (int i = 0; i < carta.getOpzioni().size(); i++) {
-        string opzione = carta.getOpzioni().at(i);
-        cout << i + 1 << "." << opzione << endl;
+    for (int i = 0; i < 5; i++) {
+        string opzione = this->mazzo->carta.getOpzioni().at(i);
+        cout << i + 1 << ". " << opzione << endl;
     }
 
     cout << "Seleziona opzione: ";
     cin >> opzioneScelta;
+    opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
+    ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
     if (opzioneCorretta == opzioneScelta) {
-        cout << "Corretta";
+        cout << "Corretta. Avanzi di 2 caselle!" << endl;
+        spostaGiocatore(2);
+        cout << giocatoreCorrente->getNome()
+                 << " si trova ora alla casella "
+                 << giocatoreCorrente->getPosizione()
+                 << endl;
+
     } else {
-        cout << "Sbagliata";
+        cout << "Sbagliata. Torni indietro di 3 caselle.." << endl;
+        spostaGiocatore(-3);
+        cout << giocatoreCorrente->getNome()
+                 << " si trova ora alla casella "
+                 << giocatoreCorrente->getPosizione()
+                 << endl;
     }
+    this->mazzo = this->mazzo->next;
 };
+
+void Game::pescaCarta_rosso(){
+	string testo = this->mazzo_rosso->carta.getTesto();
+
+	Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
+	cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta dal mazzo rosso. E' una carta ";
+	cout << this->mazzo_rosso->carta.getTesto() << endl;
+	TipoCarta tipoCarta = this->mazzo_rosso->carta.getTipoCarta();
+
+	switch(tipoCarta){
+	default:
+		break;
+	case Carta_PerdiTurno:
+	{
+		this->perdiTurni();
+		break;
+	}
+	case Carta_DadoMagico:
+	{
+		break;
+	}
+	case Carta_PescaCarta:
+	{
+		this->pescaCarta();
+		break;
+	}
+	case Carta_Sposta:
+	{
+		this->sposta();
+		break;
+	}
+	case Carta_Ritira:
+	{
+		this->tiraDadi();
+		break;
+	}
+	case Carta_Scambia:
+	{
+		this->scambiaGiocatori();
+		break;
+	}
+	}
+	this->mazzo_rosso = this->mazzo_rosso->next;
+};
+
 
 void Game::tornaInizio() {
     Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
     giocatoreCorrente->setPosizione(0);
+    cout << giocatoreCorrente->getNome() << " torna al punto di partenza! Nuova posizione: 0" << endl;
 };
 
 vector<Giocatore *> Game::getGiocatori() {
@@ -317,10 +497,13 @@ void Game::setTabellone(vector<Casella *> tabellone) {
     this->tabellone = move(tabellone);
 };
 
-vector<Carta> Game::getMazzo() {
-    return this->mazzo;
-};
+//TODO: sistemare maybe
+//vector<Carta> Game::getMazzo() {
+//    return this->mazzo;
+//};
 
-void Game::setMazzo(vector<Carta> mazzo) {
-    this->mazzo = move(mazzo);
-};
+
+//TODO: sistemare maybe
+//void Game::setMazzo(vector<Carta> mazzo) {
+//    this->mazzo = move(mazzo);
+//};

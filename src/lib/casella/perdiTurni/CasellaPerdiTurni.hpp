@@ -11,7 +11,7 @@
 class CasellaPerdiTurni : public Casella {
     private:
         /// Turni in cui il giocatore deve stare fermo
-        int turni;
+        int turni = 0;
 
     public:
         /// Costruttore

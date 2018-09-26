@@ -4,10 +4,18 @@
 
 #include "Carta.hpp"
 
-Carta::Carta(string testo, vector<string> opzioni, int corretta) {
+Carta::Carta(){
+	this->testo = " ";
+	this->opzioni = {};
+	this->corretta = 0;
+	this->tipo = Carta_Vuota;
+};
+
+Carta::Carta(string testo, vector<string> opzioni, int corretta, TipoCarta tipo) {
     this->testo = testo;
     this->opzioni = opzioni;
     this->corretta = corretta;
+    this->tipo = tipo;
 };
 
 string Carta::getTesto() {
@@ -33,3 +41,7 @@ int Carta::getCorretta() {
 void Carta::setCorretta(int corretta) {
     this->corretta = corretta;
 };
+
+TipoCarta Carta::getTipoCarta(){
+	return this->tipo;
+}

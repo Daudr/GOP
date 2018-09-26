@@ -15,8 +15,10 @@ enum TipoCasella {
     Fine,
     Sposta,
     PescaCarta,
+	PescaCarta_Rosso,
     PerdiTurni,
-    TornaInizio
+    TornaInizio,
+	Scambia
 };
 
 class Casella {
@@ -24,7 +26,7 @@ class Casella {
         /// Testo della casella
         string testo = "Vuota";
 
-        /// Tipo della casella;
+        /// Tipo della casella
         TipoCasella tipo = Vuota;
 
     public:

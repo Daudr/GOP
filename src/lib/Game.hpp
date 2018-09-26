@@ -16,10 +16,15 @@
 
 using namespace std;
 
+struct Mazzo {
+	Carta carta = Carta();
+	Mazzo* next;
+};
+
 class Game {
     private:
         /// Numero dei giocatori
-        int numeroGiocatori;
+        int numeroGiocatori = 0;
 
         /// Array di giocatori
         vector<Giocatore *> giocatori;
@@ -30,8 +35,11 @@ class Game {
         /// Array delle caselle che compongono il tabellone
         vector<Casella *> tabellone;
 
-        /// Array delle carte che compongono il mazzo
-        vector<Carta> mazzo;
+        /// Puntatore alla lista delle carte che compongono il mazzo di domande
+        Mazzo* mazzo = NULL;
+
+        /// Puntatore alla liste delle carte che compongono il mazzo di bonus e penalità
+        Mazzo* mazzo_rosso = NULL;
 
         /// Indica se il gioco Ã¨ finito
         bool gameEnded = false;
@@ -50,14 +58,26 @@ class Game {
         /// Finisce il gioco
         void endGame ();
 
-        /// Sposta un giocatore
+        /// Sposta il giocatore
         void spostaGiocatore(int spostamento);
-
-        /// Sposta la posizione di due giocatori
-        void spostaGiocatori();
 
         /// Simula il tiro di due dadi da 6 facce e lo spostamento del giocatore
         void tiraDadi();
+
+        /// Simula il tiro di un dado da 6 facce, senza spostamento
+        int tiraDado_nospost();
+
+        /// Sposta il giocatore. Funzione per la casella
+        void sposta();
+
+        /// Scambia la posizione di due giocatori
+        void scambiaGiocatori();
+
+        /// Il giocatore perde un numero di turni casuale
+        void perdiTurni();
+
+        /// Lancia il dado. Se pari va avanti di 2, se dispari va indietro di 3
+        void DadoMagico();
 
         /// Stampa il nome e la posizione del giocatore corrente;
         void printGiocatoreCorrente();
@@ -68,11 +88,17 @@ class Game {
         /// Stampa il tabellone sulla console
         void printTabellone();
 
-        /// Inizializza il mazzo
+        /// Inizializza il mazzo delle domande
         void initMazzo();
+
+        /// Inizializza il mazzo dei bonus e delle penalità
+        void initMazzo_Rosso();
 
         /// Pesca una carta dal mazzo
         void pescaCarta();
+
+        /// Pesca una carta dal mazzo bonus e penalità
+        void pescaCarta_rosso();
 
         /// Fa tornare un giocatore alla prima casella
         void tornaInizio();
@@ -109,7 +135,7 @@ class Game {
         vector<Carta> getMazzo();
 
         /// Imposta l'array delle carte che compongono il mazzo
-        void setMazzo(vector<Carta> mazzo);
+        void setMazzo(Mazzo* pointer);
 };
 
 #endif //GOP_GAME_HPP

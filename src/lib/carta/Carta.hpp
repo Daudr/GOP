@@ -10,6 +10,16 @@
 
 using namespace std;
 
+enum TipoCarta {
+	Carta_Vuota,
+	Carta_PerdiTurno,
+	Carta_DadoMagico,
+	Carta_PescaCarta,
+	Carta_Sposta,
+	Carta_Ritira,
+	Carta_Scambia
+};
+
 class Carta {
     private:
         /// Testo della carta
@@ -21,12 +31,17 @@ class Carta {
         /// Indice della risposta giusta
         int corretta;
 
+        /// Tipo della carta
+        TipoCarta tipo = Carta_Vuota;
+
     public:
+        Carta();
+
         /// Costruttore
         /// @param testo Testo della carta
         /// @param opzioni Array delle opzioni
         /// @param corretta Indice della risposta giusta
-        Carta(string testo, vector<string> opzioni, int corretta);
+        Carta(string testo, vector<string> opzioni, int corretta, TipoCarta tipo);
 
         /// Ritorna il testo della carta
         string getTesto();
@@ -47,6 +62,10 @@ class Carta {
 
         /// Imposta l'indice dell'opzione giusta
         void setCorretta(int corretta);
+
+        /// Ritorna il tipo della carta
+        TipoCarta getTipoCarta();
+
 };
 
 
