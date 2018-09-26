@@ -9,35 +9,35 @@
 // così si evitano ripetizioni
 vector<Carta> CARTE = {
         { "GEOGRAFIA: Quale continente contiene il maggior numero di paesi?",
-				{"Europa", "Asia", "Sud America", "Africa", "Oceania"}, 3
+				{"Europa", "Asia", "Sud America", "Africa", "Oceania"}, 3, Carta_Vuota
         },
 
 		{ "GEOGRAFIA: Quale è la catena montuosa più lunga?",
-				{"Ande", "Grande Catena Divisoria", "Urali","Himalaya","Montagne Rocciose"}, 0
+				{"Ande", "Grande Catena Divisoria", "Urali","Himalaya","Montagne Rocciose"}, 0, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: Qual è il lago più esteso in superficie? (Tolto il Mar Caspio!)",
-				{"Lago Baikal","Lago Vittoria","Lago Superiore","Lago Michigan","Lago Huron"}, 2
+				{"Lago Baikal","Lago Vittoria","Lago Superiore","Lago Michigan","Lago Huron"}, 2, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: Qual è la città con più abitanti?",
-				{"Città del Messico", "Tokyo", "Shanghai", "Seoul", "Delhi"}, 1
+				{"Città del Messico", "Tokyo", "Shanghai", "Seoul", "Delhi"}, 1, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: In quanti continenti c'è una città che si chiama Roma?",
-				{"2","3","5","Tutti e 7","C'è solo una capitale"}, 3
+				{"2","3","5","Tutti e 7","C'è solo una capitale"}, 3, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: Di quale stato è capitale Havana?",
-				{"Cuba", "Colombia", "Messico", "Cile", "Perù"}, 0
+				{"Cuba", "Colombia", "Messico", "Cile", "Perù"}, 0, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: In quale paese si trova il Salto Angel, la cascata con la più alta caduta al mondo?",
-				{"Uganda", "Brasile", "Venezuela","Indonesia","Nepal"}, 2
+				{"Uganda", "Brasile", "Venezuela","Indonesia","Nepal"}, 2, Carta_Vuota
 		},
 
 		{ "GEOGRAFIA: Qual è il secondo stato più grande al mondo per superficie?",
-				{"Cina", "Stati Uniti d'America", "Canada", "Brasile", "Australia"}, 2
+				{"Cina", "Stati Uniti d'America", "Canada", "Brasile", "Australia"}, 2, Carta_Vuota
 		},
 
 //        { "3", {}, 0 },
