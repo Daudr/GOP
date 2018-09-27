@@ -2,26 +2,23 @@
 // Created by michele.da.rin on 07/07/2018.
 //
 
-//TODO: finire di implementare PescaCarta_Bis
-//TODO: cambiare nomi da mazzo/mazzo_bis a mazzo_blu/mazzo_rosso
+//TODO: Gestire eccezioni per quando si da una risposta a una domanda multipla che non è un numero
 //TODO: cambiare scritte per le caselle e carte speciale in modo che non risulti più "casella" in stampa
-//TODO: finire di aggiugnere domande
 //TODO: aggiungere stampa del tabellone a ogni fine turno
-//TODO: - BUG - Se giocatore torna indietro all'inizio finisce alla fine del tabellone. Es: 4 -> spostamento -6 -> penultima casella
-//TODO: - SOLUZIONE BUG (da implementare) - mettere if di controllo in funzione spostaGiocatore
 
 #include <iostream>
 #include <vector>
 #include <iomanip>
 #include <utility>
 #include "Game.hpp"
+
+#include "carte_blu.hpp"
 #include "casella/inizio/CasellaInizio.hpp"
 #include "casella/fine/CasellaFine.hpp"
 #include "casella/pesca_rosso/CasellaPesca_Rosso.hpp"
 #include "casella/sposta/CasellaSposta.hpp"
 #include "casella/perdiTurni/CasellaPerdiTurni.hpp"
 #include "casella/Casella.hpp"
-#include "carte.hpp"
 #include "carte_rosso.hpp"
 #include "casella/pesca_blu/CasellaPesca_Blu.hpp"
 #include "casella/scambia/CasellaScambia.hpp"
@@ -151,10 +148,14 @@ void Game::endGame() {
 void Game::spostaGiocatore(int spostamento) {
     Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
     int posizioneCorrente = giocatoreCorrente->getPosizione();
+    int lungh = this->tabellone.size();
 
-    if (posizioneCorrente + spostamento > this->tabellone.size()) {
-        // Torna indietro per la differenza
-        spostamento = (posizioneCorrente + spostamento) - this->tabellone.size();
+    if (posizioneCorrente + spostamento >= lungh) {
+        // Torna avanti al massimo fino a fine tabellone
+    	spostamento = lungh - posizioneCorrente - 1;
+    } else if (posizioneCorrente + spostamento < 0){
+    	// Torna indietro al massimo fino a inizio tabellone
+    	spostamento = - posizioneCorrente;
     }
 
     giocatoreCorrente->setPosizione(posizioneCorrente + spostamento);
@@ -203,9 +204,15 @@ void Game::sposta(){
 	Casella *casella = this->tabellone.at(giocatore->getPosizione());
 	CasellaSposta *casellaSposta = static_cast<CasellaSposta *>(casella);
 	int spostamento = casellaSposta->getSpostamento();
+	cout << "Casella spostamento! " << endl;
+
+	if (spostamento > 0){
+		cout << "Avanzi di " << spostamento << endl;
+	} else {
+		cout << "Torni indietro di " << spostamento << endl;
+	}
+
 	this->spostaGiocatore(spostamento);
-	cout << "Casella spostamento! " << giocatore->getNome()
-	     << " si trova ora alla casella " << giocatore->getPosizione() << endl;
 }
 
 void Game::scambiaGiocatori() {
@@ -239,7 +246,6 @@ void Game::perdiTurni(){
 }
 
 void Game::DadoMagico(){
-	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
 	int spostamento = this->tiraDado_nospost();
 
 	if ((spostamento % 2) == 0){
@@ -383,7 +389,6 @@ void Game::pescaCarta_blu() {
 //    Carta carta = this->mazzo.at(numeroCarta);
     int opzioneCorretta = this->mazzo->carta.getCorretta();
     int opzioneScelta;
-    Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
     cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta dal mazzo blu: " << endl << endl;
     cout << this->mazzo->carta.getTesto() << endl;
