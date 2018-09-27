@@ -14,8 +14,8 @@ enum TipoCarta {
 	Carta_Vuota,
 	Carta_PerdiTurno,
 	Carta_DadoMagico,
-	Carta_PescaCarta,
-	Carta_Sposta,
+	Carta_PescaCartaBlu,
+	Carta_Indietro_5,
 	Carta_Ritira,
 	Carta_Scambia
 };

@@ -95,7 +95,7 @@ class Game {
         void initMazzo_Rosso();
 
         /// Pesca una carta dal mazzo
-        void pescaCarta();
+        void pescaCarta_blu();
 
         /// Pesca una carta dal mazzo bonus e penalità
         void pescaCarta_rosso();
