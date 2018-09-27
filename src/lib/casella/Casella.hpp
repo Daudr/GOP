@@ -14,7 +14,7 @@ enum TipoCasella {
     Inizio,
     Fine,
     Sposta,
-    PescaCarta,
+    PescaCarta_Blu,
 	PescaCarta_Rosso,
     PerdiTurni,
     TornaInizio,

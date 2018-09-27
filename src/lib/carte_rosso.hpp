@@ -15,10 +15,10 @@ using namespace std;
 #define LIB_CARTE_BIS_HPP_
 
 const vector<Carta> CARTE_ROSSO = {
-		{"PerdiTurno", {}, 0, Carta_PerdiTurno},
-		{"DadoMagico", {}, 0, Carta_DadoMagico},
-		{"PescaCarta", {}, 0, Carta_PescaCarta},
-		{"Sposta", {}, 0, Carta_Sposta},
+		{"Perdi Turno", {}, 0, Carta_PerdiTurno},
+		{"Dado Magico", {}, 0, Carta_DadoMagico},
+		{"Pesca Blu", {}, 0, Carta_PescaCartaBlu},
+		{"Torna Indietro 5", {}, 0, Carta_Indietro_5},
 		{"Ritira", {}, 0, Carta_Ritira},
 		{"Scambia", {}, 0, Carta_Scambia}
 };
