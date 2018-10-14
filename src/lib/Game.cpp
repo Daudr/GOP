@@ -2,14 +2,14 @@
 // Created by michele.da.rin on 07/07/2018.
 //
 
-//TODO: Gestire eccezioni per quando si da una risposta a una domanda multipla che non è un numero
-//TODO: cambiare scritte per le caselle e carte speciale in modo che non risulti più "casella" in stampa
-//TODO: aggiungere stampa del tabellone a ogni fine turno
+//TODO: Gestire eccezioni per quando si da una risposta a una domanda multipla che non ï¿½ un numero
+//TODO: cambiare scritte per le caselle e carte speciale in modo che non risulti piï¿½ "casella" in stampa
 
 #include <iostream>
 #include <vector>
 #include <iomanip>
 #include <utility>
+#include "stdlib.h"
 #include "Game.hpp"
 
 #include "carte_blu.hpp"
@@ -30,11 +30,13 @@
 Game::Game() {
     std::cout << "Quanti giocatori: ";
     std::cin >> this->numeroGiocatori;
+    cin.ignore();
 
     for (int i = 0; i < this->numeroGiocatori; i++) {
         string nomeGiocatore;
         cout << "Come si chiama il giocatore " << i + 1 << " : ";
         cin >> nomeGiocatore;
+        cin.ignore();
 
         Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
         this->giocatori.push_back(nuovoGiocatore);
@@ -50,6 +52,7 @@ Game::Game(int giocatori) {
         string nomeGiocatore;
         cout << "Come si chiama il giocatore " << i + 1 << " : ";
         cin >> nomeGiocatore;
+        cin.ignore();
 
         Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
         this->giocatori.push_back(nuovoGiocatore);
@@ -122,17 +125,22 @@ void Game::startGame() {
                 }
               }
 
-            // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
+            // Se il giocatore corrente ï¿½ l'ultimo imposta l'indice del giocatore
             // successivo a 0
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
             cout << endl << endl;
         } else {
-        	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl << endl;
+            cout << giocatoreCorrente->getNome() << " ï¿½ fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl << endl;
             giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);	//Giocatore successivo
            }
-        // Aspetta la pressione di un tasto per passare al turno successivo
-        pause();
+
+        this->printTabellone();
+
+        // Aspetta la pressione del tasto invio per passare al turno successivo
+        cout << "Premi invio per continuare...";
+        cin.ignore();
+        cout << string( 100, '\n' );
     }
 };
 
@@ -193,7 +201,7 @@ int Game::tiraDado_nospost(){
 
 	int risultato = (rand() % 6) + 1;
 
-	cout << "Il risultato del tiro è "
+	cout << "Il risultato del tiro ï¿½ "
 	         << risultato << "." << endl;
 
 	return risultato;
@@ -209,7 +217,7 @@ void Game::sposta(){
 	if (spostamento > 0){
 		cout << "Avanzi di " << spostamento << endl;
 	} else {
-		cout << "Torni indietro di " << spostamento << endl;
+		cout << "Torni indietro di " << abs(spostamento) << endl;
 	}
 
 	this->spostaGiocatore(spostamento);
@@ -221,7 +229,7 @@ void Game::scambiaGiocatori() {
     //Viene scelto a caso uno degli altri giocatori.
     //-1 e +1 assicurano che non velga scelto di nuovo il giocatore corrente
     //Esempio: 5 giocatori, 2 giocatoreCorrente. Per -1 ho random un numero tra 0 e 3,
-    //per +1 il random diventa tra 1 e 4, dunque prossimoGiocatore è random tra {3,4,0,1}
+    //per +1 il random diventa tra 1 e 4, dunque prossimoGiocatore ï¿½ random tra {3,4,0,1}
     Giocatore *giocatoreSuccessivo = this->getGiocatori().at(prossimoGiocatore);
 
     int posizione = giocatoreCorrente->getPosizione();
@@ -236,7 +244,7 @@ void Game::scambiaGiocatori() {
 };
 
 void Game::perdiTurni(){
-	//TODO: Poi perché dynamic_cast dà bug e static_cast no?
+	//TODO: Poi perchï¿½ dynamic_cast dï¿½ bug e static_cast no?
 	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
 	Casella *casella = this->tabellone.at(giocatore->getPosizione());
 	CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
@@ -249,10 +257,10 @@ void Game::DadoMagico(){
 	int spostamento = this->tiraDado_nospost();
 
 	if ((spostamento % 2) == 0){
-		cout << "Il risultato è pari: avanzi di tante caselle quanto è il risultato del dado" << endl;
+		cout << "Il risultato ï¿½ pari: avanzi di tante caselle quanto ï¿½ il risultato del dado" << endl;
 		this->spostaGiocatore(spostamento);
 	}	else{
-		cout << "Il risultato è dispari: torni indietro di tante caselle quanto è il risultato del dado" << endl;
+		cout << "Il risultato ï¿½ dispari: torni indietro di tante caselle quanto ï¿½ il risultato del dado" << endl;
 		this->spostaGiocatore( - spostamento);
 	}
 }
@@ -312,7 +320,6 @@ void Game::initTabellone() {
                 else if (randInt <= 95)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
-                	//TODO: Perché c'era tabellone.at?
                 	this->tabellone.push_back(new CasellaTornaInizio());
             }
         }
@@ -332,23 +339,29 @@ void Game::printTabellone() {
 
             Casella *casella = this->tabellone.at(pos);
 
-            // show_players_position(c,pos,players,numPlayers);
+            for (int y = 0; y < this->giocatori.size(); y++) {
+                if (this->giocatori.at(y)->getPosizione() == pos) {
+                    cout << this->giocatori.at(y)->getNome()[0];
+                }
+            }
 
             cout << (j > 0 ? "| " : "");
-            // cout << right << setfill(' ') << setw(this->numeroGiocatori) << c;
+            cout << right << setfill(' ') << setw(this->numeroGiocatori) << '\0';
             cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
 
         }
         cout << endl;
     }
+
+    cout << endl << endl << endl;
 };
 
 void Game::initMazzo() {
 	//TODO: fissato il numero di carte con il numero delle domande inserite
-	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
+	//		altrimenti servirebbero tipo 100/101 carte per far sï¿½ che nel mazzo non ci siano ripetizioni
 //    int numeroCarte = rand() % 41 + 60;
 	this->mazzo = new Mazzo;
-	/// tmp_head segna dove inizia la creazione del mazzo, così poi da potercisi
+	/// tmp_head segna dove inizia la creazione del mazzo, cosï¿½ poi da potercisi
 	/// riattaccare alla fine e creare un lista circolare
     Mazzo* tmp_head = this->mazzo;
 	int numeroCarta = rand() % (CARTE.size());
@@ -400,6 +413,7 @@ void Game::pescaCarta_blu() {
 
     cout << "Seleziona opzione: ";
     cin >> opzioneScelta;
+    cin.ignore();
     opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
     ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
