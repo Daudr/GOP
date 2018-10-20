@@ -28,9 +28,14 @@
 #define W_COLUMN 39
 
 Game::Game() {
-    std::cout << "Quanti giocatori: ";
+    std::cout << "Quanti giocatori? ";
     std::cin >> this->numeroGiocatori;
 
+    while (this->numeroGiocatori < 2){
+    	cout << "Numero minimo di giocatori consetito è 2. Quanti giocatori?: ";
+    	cin >> this->numeroGiocatori;
+    }
+
     for (int i = 0; i < this->numeroGiocatori; i++) {
         string nomeGiocatore;
         cout << "Come si chiama il giocatore " << i + 1 << " : ";
@@ -43,28 +48,31 @@ Game::Game() {
     this->startGame();
 };
 
-Game::Game(int giocatori) {
-    this->numeroGiocatori = giocatori;
 
-    for (int i = 0; i < this->numeroGiocatori; i++) {
-        string nomeGiocatore;
-        cout << "Come si chiama il giocatore " << i + 1 << " : ";
-        cin >> nomeGiocatore;
-
-        Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
-        this->giocatori.push_back(nuovoGiocatore);
-    }
-
-    this->startGame();
-};
+//Funzione per test al gioco
+//Game::Game(int giocatori) {
+//    this->numeroGiocatori = giocatori;
+//
+//    for (int i = 0; i < this->numeroGiocatori; i++) {
+//        string nomeGiocatore;
+//        cout << "Come si chiama il giocatore " << i + 1 << " : ";
+//        cin >> nomeGiocatore;
+//
+//        Giocatore *nuovoGiocatore = new Giocatore(nomeGiocatore);
+//        this->giocatori.push_back(nuovoGiocatore);
+//    }
+//
+//    this->startGame();
+//};
 
 void Game::startGame() {
+
     this->initTabellone();
 
     this->printTabellone();
 
-    this->initMazzo();
-    this->initMazzo_Rosso();
+    this->initMazzo_blu();
+    this->initMazzo_rosso();
 
     while(!this->gameEnded) {
         Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
@@ -125,11 +133,14 @@ void Game::startGame() {
             // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);
+            this->printTabellone();
             cout << endl << endl;
         } else {
         	cout << giocatoreCorrente->getNome() << " è fermo per ancora " << giocatoreCorrente->getFermo() << " turni" << endl << endl;
             giocatoreCorrente->setFermo(giocatoreCorrente->getFermo() - 1);
             this->setGiocatoreCorrente((this->giocatoreCorrente + 1) % this->numeroGiocatori);	//Giocatore successivo
+            this->printTabellone();
+            cout << endl << endl;
            }
         // Aspetta la pressione di un tasto per passare al turno successivo
         pause();
@@ -236,7 +247,6 @@ void Game::scambiaGiocatori() {
 };
 
 void Game::perdiTurni(){
-	//TODO: Poi perché dynamic_cast dà bug e static_cast no?
 	Giocatore *giocatore = this->giocatori.at(this->giocatoreCorrente);
 	Casella *casella = this->tabellone.at(giocatore->getPosizione());
 	CasellaPerdiTurni *casellaPerdiTurni = static_cast<CasellaPerdiTurni *>(casella);
@@ -274,7 +284,7 @@ void Game::initTabellone() {
     int randInt = 0;
 
     // Generazione altre caselle
-    /* ProbabilitÃ  in percentuali:
+    /* Probabilità  in percentuali:
      * - Vuota:                                     100% -> 70% -> 40% -> 10% -> 0%
      * Se non viene la casella vuota:
      * - Pesca una carta da mazzo blu:              20%
@@ -312,7 +322,6 @@ void Game::initTabellone() {
                 else if (randInt <= 95)
                     this->tabellone.push_back(new CasellaPerdiTurni(rand() % 3 + 1));
                 else
-                	//TODO: Perché c'era tabellone.at?
                 	this->tabellone.push_back(new CasellaTornaInizio());
             }
         }
@@ -320,33 +329,94 @@ void Game::initTabellone() {
 };
 
 void Game::printTabellone() {
-    int r = (this->tabellone.size() % N_COLUMNS == 0) ? 0 : 1;
-    int n = this->tabellone.size() / N_COLUMNS + r;
+	int num_gioc = this->numeroGiocatori;
+    int r = ((this->tabellone.size() + num_gioc) % N_COLUMNS == 0) ? 0 : 1;
+    int n = (this->tabellone.size() + num_gioc) / N_COLUMNS + r;
+
+
+    // Vettore che al posto i-esimo ha la posizione del giocatore i-esimo
+    vector<int> gioc_pos;
+    for(int i = 0; i < num_gioc; i++){
+    	gioc_pos.push_back(this->giocatori.at(i)->getPosizione());
+    }
+
+    // Array che al posto i-esimo ha il numero di giocatori che vengono rappresentati alla i-esima colonna
+    vector<int> contatore;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	contatore.push_back(0);
+    }
+
+    int tmp = 0;
+    vector<int> tmp_2 (sort_int(gioc_pos));
+
+    for (int i = 0; i < num_gioc; i++){
+    	tmp = ((tmp_2[i]+i) / n);
+    	if (tmp < (N_COLUMNS - 1)){
+    		for (int j = 1; (tmp + j < N_COLUMNS); j++){
+    			contatore[tmp + j] = contatore [tmp + j] + 1;
+    		}
+    	}
+    }
+
+
+    vector<int> contatore_2;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	contatore_2.push_back(0);
+    }
+
+    vector<bool> is_player;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	is_player.push_back(false);
+    }
+
+    int tmp_3 = 0;
 
     for(int i = 0; i < n; i++) {
         for (int j = 0; j < N_COLUMNS; j++) {
-            int pos = i + j * n;
+            int pos = i + j * n - contatore[j] - contatore_2[j];
             if (pos >= this->tabellone.size()) {
                 continue;
             }
 
             Casella *casella = this->tabellone.at(pos);
+            Giocatore *giocatoreCorrente = this->giocatori.at(tmp_3);
 
-            // show_players_position(c,pos,players,numPlayers);
+            if (j > 0) {
+            	cout << "| ";
+            }
 
-            cout << (j > 0 ? "| " : "");
-            // cout << right << setfill(' ') << setw(this->numeroGiocatori) << c;
-            cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
+            if (is_player[j]) {
+            	cout << right << setw(2) << "   " << left << setfill(' ') << setw(W_COLUMN) << giocatoreCorrente->getNome();
+            	is_player[j] = false;
+            	tmp_3 = tmp_3 + 1;
+            }
+            else {
+            	cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
+            }
+
+            for (int k = tmp_3; ((k < num_gioc) && (is_player[j] == false)); k++){
+            	if (gioc_pos[k] == pos){
+            		contatore_2[j] = contatore_2[j] + 1;
+            		is_player[j] = true;
+            		tmp_3 = k;
+            	}
+            }
+
+
+
+            /// Set tmp_3 = 0, perché array giocatori è stato percorso tutto
+            if (tmp_3 == (num_gioc)) {
+            	tmp_3 = 0;
+            }
+
+//            cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
 
         }
         cout << endl;
     }
 };
 
-void Game::initMazzo() {
-	//TODO: fissato il numero di carte con il numero delle domande inserite
-	//		altrimenti servirebbero tipo 100/101 carte per far sì che nel mazzo non ci siano ripetizioni
-//    int numeroCarte = rand() % 41 + 60;
+void Game::initMazzo_blu() {
 	this->mazzo = new Mazzo;
 	/// tmp_head segna dove inizia la creazione del mazzo, così poi da potercisi
 	/// riattaccare alla fine e creare un lista circolare
@@ -366,7 +436,7 @@ void Game::initMazzo() {
     this->mazzo->next = tmp_head;
 };
 
-void Game::initMazzo_Rosso() {
+void Game::initMazzo_rosso() {
 	this->mazzo_rosso = new Mazzo;
     Mazzo* tmp_head = this->mazzo_rosso;
 	int numeroCarta = rand() % 5;
@@ -385,8 +455,6 @@ void Game::initMazzo_Rosso() {
 
 
 void Game::pescaCarta_blu() {
-//    int numeroCarta = rand() % this->tabellone.size();
-//    Carta carta = this->mazzo.at(numeroCarta);
     int opzioneCorretta = this->mazzo->carta.getCorretta();
     int opzioneScelta;
 
@@ -400,6 +468,10 @@ void Game::pescaCarta_blu() {
 
     cout << "Seleziona opzione: ";
     cin >> opzioneScelta;
+    while (opzioneScelta > 5 or opzioneScelta < 1){
+    	cout << "Selezione non valida. Inserisci un numero tra 1 e 5" << endl;
+    	cin >> opzioneScelta;
+    }
     opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
     ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
@@ -470,9 +542,9 @@ vector<Giocatore *> Game::getGiocatori() {
     return this->giocatori;
 };
 
-void Game::setGiocatori(vector<Giocatore *> giocatori) {
-    this->giocatori = move(giocatori);
-};
+//void Game::setGiocatori(vector<Giocatore *> giocatori) {
+//    this->giocatori = move(giocatori);
+//};
 
 int Game::getGiocatoreCorrente() {
     return this->giocatoreCorrente;
@@ -482,29 +554,10 @@ void Game::setGiocatoreCorrente(int giocatoreCorrente) {
     this->giocatoreCorrente = giocatoreCorrente;
 };
 
-bool Game::isGameEnded() {
-    return this->gameEnded;
-};
+//bool Game::isGameEnded() {
+//    return this->gameEnded;
+//};
 
 void Game::setGameEnded(bool gameEnded) {
     this->gameEnded = gameEnded;
 };
-
-vector<Casella *> Game::getTabellone() {
-    return this->tabellone;
-};
-
-void Game::setTabellone(vector<Casella *> tabellone) {
-    this->tabellone = move(tabellone);
-};
-
-//TODO: sistemare maybe
-//vector<Carta> Game::getMazzo() {
-//    return this->mazzo;
-//};
-
-
-//TODO: sistemare maybe
-//void Game::setMazzo(vector<Carta> mazzo) {
-//    this->mazzo = move(mazzo);
-//};

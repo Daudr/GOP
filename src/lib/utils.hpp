@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <limits>
+#include <vector>
 
 using namespace std;
 
@@ -15,5 +16,9 @@ void clearCin();
 
 /// Aspetta la pressione del tasto invio per continuare
 void pause();
+
+/// Funzione che mette in ordine crescente gli elementi di un array
+/// @param
+vector<int> sort_int(vector<int> arr);
 
 #endif //GOP_UTILS_HPP

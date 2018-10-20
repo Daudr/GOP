@@ -23,13 +23,13 @@ enum TipoCarta {
 class Carta {
     private:
         /// Testo della carta
-        string testo;
+        string testo = "";
 
         /// Opzioni della carta
-        vector<string> opzioni;
+        vector<string> opzioni = {};
 
         /// Indice della risposta giusta
-        int corretta;
+        int corretta = 0;
 
         /// Tipo della carta
         TipoCarta tipo = Carta_Vuota;

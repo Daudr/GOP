@@ -3,11 +3,6 @@
 
 #include "carta/Carta.hpp"
 
-//TODO: è necessario usare per forza const?
-// lasciandolo senza const in initMazzo si può
-// facilmente eliminare la carte appena messa nel mazzo,
-// così si evitano ripetizioni
-
 //        {string "Testo", {vect<string> opzioni}, int corretta, TipoCarta tipo },
 
 vector<Carta> CARTE = {

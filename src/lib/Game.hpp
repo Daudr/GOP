@@ -89,10 +89,10 @@ class Game {
         void printTabellone();
 
         /// Inizializza il mazzo delle domande
-        void initMazzo();
+        void initMazzo_blu();
 
         /// Inizializza il mazzo dei bonus e delle penalità
-        void initMazzo_Rosso();
+        void initMazzo_rosso();
 
         /// Pesca una carta dal mazzo
         void pescaCarta_blu();

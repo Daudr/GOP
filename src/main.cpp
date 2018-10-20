@@ -8,7 +8,7 @@ int main() {
 	//TODO: c'era unsigned. E' da rimettere?
     srand(time(nullptr));
 
-    auto game = new Game(2);
+    auto game = new Game();
 
     return 0;
 }
