@@ -87,48 +87,54 @@ void Game::startGame() {
             Casella *casellaCorrente = this->tabellone.at(posizioneCorrente);
             TipoCasella tipoCasella = casellaCorrente->getTipoCasella();
 
-            switch (tipoCasella) {
-                default:
-                    break;
-                case Vuota:
-                    break;
-                case Fine:
-                {
-                    this->endGame();
-                    break;
-                }
-                case PerdiTurni:
-                {
+            do {
+                switch (tipoCasella) {
+                    default:
+                        break;
+                    case Vuota:
+                        break;
+                    case Fine:
+                    {
+                        this->endGame();
+                        break;
+                    }
+                    case PerdiTurni:
+                    {
 
-                	this->perdiTurni();
-                	break;
-                }
-                case PescaCarta_Blu:
-                {
-                    this->pescaCarta_blu();
-                    break;
-                }
-                case PescaCarta_Rosso:
-                {
-                	this->pescaCarta_rosso();
-                	break;
-                }
-                case Scambia:
-                {
-                    this->scambiaGiocatori();
-                    break;
-                }
-                case Sposta:
-                {
-                	this->sposta();
-                	break;
-                }
-                case TornaInizio:
-                {
-                    this->tornaInizio();
-                    break;
-                }
-              }
+                    	this->perdiTurni();
+                    	break;
+                    }
+                    case PescaCarta_Blu:
+                    {
+                        this->pescaCarta_blu();
+                        break;
+                    }
+                    case PescaCarta_Rosso:
+                    {
+                    	this->pescaCarta_rosso();
+                    	break;
+                    }
+                    case Scambia:
+                    {
+                        this->scambiaGiocatori();
+                        break;
+                    }
+                    case Sposta:
+                    {
+                    	this->sposta();
+                    	break;
+                    }
+                    case TornaInizio:
+                    {
+                        this->tornaInizio();
+                        break;
+                    }
+                  }
+                posizioneCorrente = giocatoreCorrente->getPosizione();
+                casellaCorrente = this->tabellone.at(posizioneCorrente);
+                tipoCasella = casellaCorrente->getTipoCasella();
+            } while ((tipoCasella != Vuota) && (tipoCasella != Inizio) && (tipoCasella != Fine) &&
+            		(giocatoreCorrente->getFermo() == 0) && (tipoCasella != Scambia));
 
             // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
@@ -239,7 +245,8 @@ void Game::scambiaGiocatori() {
     giocatoreCorrente->setPosizione(giocatoreSuccessivo->getPosizione());
     giocatoreSuccessivo->setPosizione(posizione);
 
-    cout << giocatoreCorrente->getNome()
+    cout << "E' una Casella Scambia." << endl
+    	 << giocatoreCorrente->getNome()
          << " si trova ora alla posizione "
          << giocatoreCorrente->getPosizione()
          << ", mentre " << giocatoreSuccessivo->getNome()
@@ -461,11 +468,13 @@ void Game::pescaCarta_blu() {
     cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta dal mazzo blu: " << endl << endl;
     cout << this->mazzo->carta.getTesto() << endl;
 
-    ///Generatore di permutazioni pseudocasuali. Si usa la proprietà degli interi modulo p
-    ///per cui dati a,b,c interi e x_0 = c, allora x_(k+1) = (a*x_k + b)mod(p) è successione
-    ///pseudocasuali. Qui a = mult (moltiplicatore), b = drft.
+    /// Generatore di permutazioni pseudocasuali. Si usa la proprietà degli interi modulo p
+    /// per cui dati a,b,c interi e x_0 = c, allora x_(k+1) = (a*x_k + b)mod(p) è successione
+    /// pseudocasuali. Qui a = mult (moltiplicatore), b = drft.
+    /// Le costanti 30 e 4 sono state scelte perché 30*4 = 120, che è anche il numero delle
+    /// permutazioni totali di un insieme ordinato di 5 elementi.
     int mult, drift;
-    mult = (rand()%9)*5+1 ;
+    mult = (rand()%30)*5+1 ;
     drift = (rand()%4) + 1;
 
     for (int i = 0; i < 5; i++) {
@@ -490,6 +499,10 @@ void Game::pescaCarta_blu() {
         cout << "Sbagliata. Torni indietro di 3 caselle.." << endl;
         spostaGiocatore(-3);
     }
+
+    pause();
+    cout << endl;
+
     this->mazzo = this->mazzo->next;
 };
 
@@ -503,6 +516,10 @@ void Game::pescaCarta_rosso(){
 	this->mazzo_rosso = this->mazzo_rosso->next;
 
 	switch(tipoCarta){
+	default:
+		break;
+	case Carta_Vuota:
+		break;
 	case Carta_PerdiTurno:
 	{
 		giocatoreCorrente->setFermo(1);

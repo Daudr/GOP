@@ -4,4 +4,4 @@
 
 #include "CasellaPesca_Blu.hpp"
 
-CasellaPesca_Blu::CasellaPesca_Blu() : Casella("Pesca una carta", PescaCarta_Blu) {};
+CasellaPesca_Blu::CasellaPesca_Blu() : Casella("Pesca una carta da mazzo blu", PescaCarta_Blu) {};
