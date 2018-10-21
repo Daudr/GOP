@@ -461,8 +461,15 @@ void Game::pescaCarta_blu() {
     cout << this->giocatori.at(this->giocatoreCorrente)->getNome() << " pesca una carta dal mazzo blu: " << endl << endl;
     cout << this->mazzo->carta.getTesto() << endl;
 
+    ///Generatore di permutazioni pseudocasuali. Si usa la proprietà degli interi modulo p
+    ///per cui dati a,b,c interi e x_0 = c, allora x_(k+1) = (a*x_k + b)mod(p) è successione
+    ///pseudocasuali. Qui a = mult (moltiplicatore), b = drft.
+    int mult, drift;
+    mult = (rand()%9)*5+1 ;
+    drift = (rand()%4) + 1;
+
     for (int i = 0; i < 5; i++) {
-        string opzione = this->mazzo->carta.getOpzioni().at(i);
+        string opzione = this->mazzo->carta.getOpzioni().at((mult*i + drift)%5);
         cout << i + 1 << ". " << opzione << endl;
     }
 
@@ -472,7 +479,7 @@ void Game::pescaCarta_blu() {
     	cout << "Selezione non valida. Inserisci un numero tra 1 e 5" << endl;
     	cin >> opzioneScelta;
     }
-    opzioneScelta = opzioneScelta - 1; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
+    opzioneScelta = (mult*(opzioneScelta - 1) + drift)%5; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
     ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
     if (opzioneCorretta == opzioneScelta) {

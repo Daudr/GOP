@@ -87,7 +87,7 @@ vector<Carta> CARTE = {
 		},
 
 		{ "ZOO: Quale è il serpente più velenoso al mondo?",
-				{"Serpente Bruno Orientale", "Taipan Occidentale", "Mamba Nero", "Cobra delle Filippine", "Vipera di Russell"}, 2, Carta_Vuota
+				{"Serpente Bruno Orientale", "Taipan Occidentale", "Mamba Nero", "Cobra delle Filippine", "Vipera di Russell"}, 1, Carta_Vuota
 		},
 
 		{ "ZOO: Quale di questi animali è il più longevo?",
@@ -147,7 +147,7 @@ vector<Carta> CARTE = {
 		},
 
 		{ "NETFLICS: Quale attore è diventato virale sui social per non riuscire a vincere un Oscar? (E' poi riuscito a vincerne uno!)",
-				{"Jack Nicholson", "Jared Leto", "Colin Firth", "Leonardo di Caprio", "Robert Downey Jr."}, 4, Carta_Vuota
+				{"Jack Nicholson", "Jared Leto", "Colin Firth", "Leonardo di Caprio", "Robert Downey Jr."}, 3, Carta_Vuota
 		},
 
 		{ "NETFLICS: In quale famosa serie tv Bryan Cranston ha recitato il ruolo di un chimico criminale soprannominato 'Heisenberg'?",
