@@ -2,9 +2,7 @@
 // Created by michele.da.rin on 07/07/2018.
 //
 
-//TODO: Gestire eccezioni per quando si da una risposta a una domanda multipla che non è un numero
 //TODO: cambiare scritte per le caselle e carte speciale in modo che non risulti più "casella" in stampa
-//TODO: aggiungere stampa del tabellone a ogni fine turno
 
 #include <iostream>
 #include <vector>
@@ -136,7 +134,7 @@ void Game::startGame() {
                 casellaCorrente = this->tabellone.at(posizioneCorrente);
                 tipoCasella = casellaCorrente->getTipoCasella();
             } while ((tipoCasella != Vuota) && (tipoCasella != Inizio) && (tipoCasella != Fine) &&
-            		(giocatoreCorrente->getFermo() == 0) && (tipoCasella != Scambia) && !(this->gameEnded) && ());
+            		(giocatoreCorrente->getFermo() == 0) && (tipoCasella != Scambia) && !(this->gameEnded));
 
             // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
@@ -360,12 +358,16 @@ void Game::initTabellone() {
 /// LEGENDA VARIABILI:
 /// num_gioco -> Numero di giocatori
 /// r -> 0 o 1 a seconda che l'ultima colonna sia piena o meno
+/// n -> numero di righe per colonna
 /// gioc_pos -> Vettore che al posto i-esimo ha la posizione del giocatore i-esimo
 /// contatore -> Vettore che al posto i-esimo ha il numero di giocatori che vengono rappresentati alla i-esima colonna
 /// contatore_2 -> Vettore che si aggiorna ogni riga e al posto i-esimo indica quanti giocatori sono già stati stampati nella i-esima colonna
-/// tmp -> intero ausiliario che indica quale colonna di contatore deve essere aumentata a seconda della posizione dei giocatori
-/// tmp_2 -> vettore ausiliario con gioc_pos ordinato in maniera crescente
-/// tmp_3 -> intero ausiliario. Fermaposto per indicare quanto del vettore gioc_pos è stato percorso
+/// tmp -> 2 utilizzi diversi, specificati volta per volta
+/// gioc_pos_ord -> vettore con gioc_pos ordinato in maniera crescente
+/// stampa_gioc -> vettore intero ausiliario. Al posto i-esimo indice del giocatore da rappresentare nella colonna i-esima
+/// aumentoRighe_tot -> numero di righe necessarie in più per rappresentare un giocatore nel caso la colonna sia piena
+/// aumentoRighe_parz -> numero di righe da aggiungere in una iterazione
+/// controllo_colonna -> segnaposto che serve per azzerare tmp_3 nel caso in cui non ci siano altri giocatori da rappresentare nelle caselle di quella riga
 /// is_player -> Vettore di valori booliani. Al posto i-esimo indica se all'iterazione successiva deve essere stampato un giocatore
 
 void Game::printTabellone() {
@@ -389,16 +391,15 @@ void Game::printTabellone() {
     }
 
     int tmp = 0;
-    vector<int> tmp_2 (sort_int(gioc_pos));
-    vector<int> tmp_3;
+    vector<int> gioc_pos_ord (sort_int(gioc_pos));
+    vector<int> stampa_gioc;
     for (int i = 0; i < N_COLUMNS; i++){
-    	tmp_3.push_back(0);
+    	stampa_gioc.push_back(0);
     }
-    int tmp_4 = 0;
-    int tmp_5 = 0;
 
+    /// tmp -> intero ausiliario che indica quale colonna di contatore deve essere aumentata a seconda della posizione dei giocatori
     for (int i = 0; i < num_gioc; i++){
-    	tmp = ((tmp_2[i]+i) / n);
+    	tmp = ((gioc_pos_ord[i]+i) / n);
     	if (tmp < (N_COLUMNS - 1)){
     		for (int j = 1; (tmp + j < N_COLUMNS); j++){
     			contatore[tmp + j] = contatore [tmp + j] + 1;
@@ -406,60 +407,85 @@ void Game::printTabellone() {
     	}
     }
 
-    vector<bool> is_player;
-    for (int i = 0; i < N_COLUMNS; i++){
-    	is_player.push_back(false);
-    }
+
+    /// 2 cicli for che controllano che nelle colonne ci sia sufficiente spazio per rappresentare i giocatori
+    /// nella stessa colonna della loro posizione, eventualmente aggiungendo righe.
+    /// Il primo for fa un controllo specifico sul giocatore più avanti nel gioco.
+    /// Il secondo for controlla tutti i giocatori prima e se ci sono più giocatori non rappresentabili
+    /// nella stessa casella.
+    /// Dopo il controllo e aver contato le righe necessarie da aggiungere aggiorna i contatori
+
+    /// tmp -> conta quanti giocatori ci sono nella stessa posizione (meno il primo)
 
     tmp = 0	;
+    int aumentoRighe_tot = 0;
     int i = 0;
     int j = 0;
 
-    for (int k = 1; k < N_COLUMNS; k++){
-    	if (contatore[k] == num_gioc){
-            if (((tmp_2[num_gioc-1] + contatore[k]) == (n*k)) && ((tmp_2[num_gioc-1]) != (tmp_2[num_gioc-2]))){
-            	tmp_5 = tmp_5 + 1;
-            }
-    	}
-    	else if (contatore[k] == (num_gioc-1)){
-            if (((tmp_2[num_gioc-1] + contatore[k] + 1) == (n*k)) && ((tmp_2[num_gioc-1]) != (tmp_2[num_gioc-2]))){
-            	tmp_5 = tmp_5 + 1;
-            	contatore[k] = contatore[k] + 1;
-            }
-    	}
-    }
-
     while (i < (num_gioc-1)){
-    	while ((tmp_2[j] == tmp_2[j+1]) && (j < num_gioc)){
+    	while ((gioc_pos_ord[j] == gioc_pos_ord[j+1]) && (j < num_gioc)){
     		tmp = tmp + 1;
     		j = j + 1;
     	}
     	for (int k = 1; k < N_COLUMNS; k++){
     		if (tmp >0){
-        		if ((tmp_2[i] <= (n*k - 1 - contatore[k])) && (tmp_2[i] + contatore[k]) + tmp + 1 >= n*k){
-        			int fi = tmp - (n*k - 1 - tmp_2[i] - contatore[k]);
-        			tmp_5 = tmp_5 + fi;
+    			cout << "TEST IF" << endl;
+        		if ((gioc_pos_ord[i] <= (n*k - 1 - contatore[k])) && (gioc_pos_ord[i] + contatore[k] + tmp + 1 >= n*k)){
+        			cout << "TEST IF 1.1" << endl;
+        			int aumentoRighe_parz = tmp - (n*k - 1 - gioc_pos_ord[i] - contatore[k]);
+        			aumentoRighe_tot = aumentoRighe_tot + aumentoRighe_parz;
         			i = i + tmp;
         		}
     		}
-    		else if ((tmp_2[i]-i)%n == 1){
-    			if ((tmp_2[i] + contatore[k]) == n*k){
-    				tmp_5 = tmp_5 + 1;
-    			}
-    			else if ((tmp_2[i]-i)%n == 0){
-    				if ((tmp_2[i] + contatore[k] + 1) == n*k){
-    	            	tmp_5 = tmp_5 + 1;
-    	            	contatore[k] = contatore[k] + 1;
-    				}
-    			}
+    		else {
+    			cout << "TEST ELSE" << endl;
+    			if ((gioc_pos_ord[i]-i)/n == k){
+        			cout << "TEST ELSE 1.1" << endl;
+        			if ((gioc_pos_ord[i] + contatore[k]) == n*k){
+        				cout << "TEST ELSE 1.2" << endl;
+        				aumentoRighe_tot = aumentoRighe_tot + 1;
+        			}
+        			else if ((gioc_pos_ord[i]-i)/n == k-1){
+        				cout << "TEST ELSE 2" << endl;
+        				if ((gioc_pos_ord[i] + contatore[k] + 1) == n*k){
+        					cout << "TEST ELSE 2.1" << endl;
+        					aumentoRighe_tot = aumentoRighe_tot + 1;
+        	            	contatore[k] = contatore[k] + 1;
+        				}
+        			}
+        		}
     		}
     	}
+
 		tmp = 0;
     	i = i + 1;
-    	j=i;
+    	j = i;
     }
 
-    n = n + tmp_5;
+    for (int k = 1; k < N_COLUMNS; k++){
+    	if (contatore[k] == num_gioc){
+            if (((gioc_pos_ord[num_gioc-1] + contatore[k]) == (n*k)) && ((gioc_pos_ord[num_gioc-1]) != (gioc_pos_ord[num_gioc-2]))){
+            	aumentoRighe_tot = aumentoRighe_tot + 1;
+            }
+    	}
+    	else if (contatore[k] == (num_gioc-1)){
+            if (((gioc_pos_ord[num_gioc-1] + contatore[k] + 1) == (n*k)) && ((gioc_pos_ord[num_gioc-1]) != (gioc_pos_ord[num_gioc-2]))){
+            	aumentoRighe_tot = aumentoRighe_tot + 1;
+            	contatore[k] = contatore[k] + 1;
+            }
+    	}
+    }
+
+    /// Aggiornamento numero righe
+    n = n + aumentoRighe_tot;
+    cout << "AUMENTO RIGHE TOT:" << aumentoRighe_tot << " n:" << n << endl;
+
+    vector<bool> is_player;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	is_player.push_back(false);
+    }
+
+    int controllo_colonna = 0;
 
     for(int i = 0; i < n; i++) {
         for (int j = 0; j < N_COLUMNS; j++) {
@@ -473,27 +499,27 @@ void Game::printTabellone() {
             }
 
             if (is_player[j]) {
-                Giocatore *giocatoreCorrente = this->giocatori.at(tmp_3[j]);
+                Giocatore *giocatoreCorrente = this->giocatori.at(stampa_gioc[j]);
               	cout << right << setw(2) << "   " << left << setfill(' ') << setw(W_COLUMN) << giocatoreCorrente->getNome();
             	is_player[j] = false;
-                tmp_3[j] = tmp_3[j] + 1;
+            	stampa_gioc[j] = stampa_gioc[j] + 1;
             }
             else {
                 Casella *casella = this->tabellone.at(pos);
             	cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
             }
 
-            for (int k = tmp_3[j]; ((k < num_gioc) && (is_player[j] == false)); k++){
+            for (int k = stampa_gioc[j]; ((k < num_gioc) && (is_player[j] == false)); k++){
             	if (gioc_pos[k] == pos){
             		contatore_2[j] = contatore_2[j] + 1;
             		is_player[j] = true;
-            		tmp_3[j] = k;
-            		tmp_4 = j;
+            		stampa_gioc[j] = k;
+            		controllo_colonna = j;
             	}
             }
 
-            if ((tmp_3[j] > 0) && !is_player[tmp_4]){
-            	tmp_3[j] = 0;
+            if ((stampa_gioc[j] > 0) && !is_player[controllo_colonna]){
+            	stampa_gioc[j] = 0;
             }
 
         }
