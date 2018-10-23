@@ -119,7 +119,7 @@ vector<Carta> CARTE = {
 		},
 
 		{ "SPOTIFY: Di che nazionalità era Wolfgang Amadeus Mozart?",
-				{"Austriaca", "Svizzera", "Ungheresa", "Tedesca", "Polacca"}, 0, Carta_Vuota
+				{"Austriaca", "Svizzera", "Ungherese", "Tedesca", "Polacca"}, 0, Carta_Vuota
 		},
 
 		{ "SPOTIFY: Come è morto Jeff Buckley, famoso interprete (ma non scrittore) di Halleluja?",

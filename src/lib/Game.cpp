@@ -74,6 +74,8 @@ void Game::startGame() {
     this->initMazzo_blu();
     this->initMazzo_rosso();
 
+    pause();
+
     while(!this->gameEnded) {
         Giocatore *giocatoreCorrente = this->giocatori.at(this->giocatoreCorrente);
 
@@ -134,7 +136,7 @@ void Game::startGame() {
                 casellaCorrente = this->tabellone.at(posizioneCorrente);
                 tipoCasella = casellaCorrente->getTipoCasella();
             } while ((tipoCasella != Vuota) && (tipoCasella != Inizio) && (tipoCasella != Fine) &&
-            		(giocatoreCorrente->getFermo() == 0) && (tipoCasella != Scambia));
+            		(giocatoreCorrente->getFermo() == 0) && (tipoCasella != Scambia) && !(this->gameEnded) && ());
 
             // Se il giocatore corrente è l'ultimo imposta l'indice del giocatore
             // successivo a 0
@@ -148,8 +150,12 @@ void Game::startGame() {
             this->printTabellone();
             cout << endl << endl;
            }
-        // Aspetta la pressione di un tasto per passare al turno successivo
-        pause();
+
+        if (!(this->gameEnded)){
+            // Aspetta la pressione di un tasto per passare al turno successivo
+        	pause();
+        	cout << endl;
+        }
     }
 };
 
@@ -180,7 +186,7 @@ void Game::spostaGiocatore(int spostamento) {
     cout << giocatoreCorrente->getNome()
          << " si trova ora alla casella "
          << giocatoreCorrente->getPosizione()
-         << endl;
+         << endl << endl;;
 };
 
 void Game::tiraDadi() {
@@ -230,6 +236,20 @@ void Game::sposta(){
 	}
 
 	this->spostaGiocatore(spostamento);
+
+	/// Controllo che non ci sia loop di spostamenti avanti e indietro. Eventualmente il giocatore viene spostato di 1 indietro.
+    int posizioneCorrente = giocatore->getPosizione();
+    Casella *casellaArrivo = this->tabellone.at(posizioneCorrente);
+    TipoCasella tipoCasellaArrivo = casellaArrivo->getTipoCasella();
+
+    if (tipoCasellaArrivo == Sposta){
+    	CasellaSposta *casellaSpostaArrivo = static_cast<CasellaSposta *>(casellaArrivo);
+    	int spostamentoArrivo = casellaSpostaArrivo->getSpostamento();
+    	if (spostamentoArrivo == -spostamento){
+    		this->spostaGiocatore(-1);
+    	}
+    }
+
 }
 
 void Game::scambiaGiocatori() {
@@ -335,26 +355,47 @@ void Game::initTabellone() {
     }
 };
 
+
+
+/// LEGENDA VARIABILI:
+/// num_gioco -> Numero di giocatori
+/// r -> 0 o 1 a seconda che l'ultima colonna sia piena o meno
+/// gioc_pos -> Vettore che al posto i-esimo ha la posizione del giocatore i-esimo
+/// contatore -> Vettore che al posto i-esimo ha il numero di giocatori che vengono rappresentati alla i-esima colonna
+/// contatore_2 -> Vettore che si aggiorna ogni riga e al posto i-esimo indica quanti giocatori sono già stati stampati nella i-esima colonna
+/// tmp -> intero ausiliario che indica quale colonna di contatore deve essere aumentata a seconda della posizione dei giocatori
+/// tmp_2 -> vettore ausiliario con gioc_pos ordinato in maniera crescente
+/// tmp_3 -> intero ausiliario. Fermaposto per indicare quanto del vettore gioc_pos è stato percorso
+/// is_player -> Vettore di valori booliani. Al posto i-esimo indica se all'iterazione successiva deve essere stampato un giocatore
+
 void Game::printTabellone() {
 	int num_gioc = this->numeroGiocatori;
     int r = ((this->tabellone.size() + num_gioc) % N_COLUMNS == 0) ? 0 : 1;
     int n = (this->tabellone.size() + num_gioc) / N_COLUMNS + r;
 
-
-    // Vettore che al posto i-esimo ha la posizione del giocatore i-esimo
     vector<int> gioc_pos;
     for(int i = 0; i < num_gioc; i++){
     	gioc_pos.push_back(this->giocatori.at(i)->getPosizione());
     }
 
-    // Array che al posto i-esimo ha il numero di giocatori che vengono rappresentati alla i-esima colonna
     vector<int> contatore;
     for (int i = 0; i < N_COLUMNS; i++){
     	contatore.push_back(0);
     }
 
+    vector<int> contatore_2;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	contatore_2.push_back(0);
+    }
+
     int tmp = 0;
     vector<int> tmp_2 (sort_int(gioc_pos));
+    vector<int> tmp_3;
+    for (int i = 0; i < N_COLUMNS; i++){
+    	tmp_3.push_back(0);
+    }
+    int tmp_4 = 0;
+    int tmp_5 = 0;
 
     for (int i = 0; i < num_gioc; i++){
     	tmp = ((tmp_2[i]+i) / n);
@@ -365,18 +406,60 @@ void Game::printTabellone() {
     	}
     }
 
-
-    vector<int> contatore_2;
-    for (int i = 0; i < N_COLUMNS; i++){
-    	contatore_2.push_back(0);
-    }
-
     vector<bool> is_player;
     for (int i = 0; i < N_COLUMNS; i++){
     	is_player.push_back(false);
     }
 
-    int tmp_3 = 0;
+    tmp = 0	;
+    int i = 0;
+    int j = 0;
+
+    for (int k = 1; k < N_COLUMNS; k++){
+    	if (contatore[k] == num_gioc){
+            if (((tmp_2[num_gioc-1] + contatore[k]) == (n*k)) && ((tmp_2[num_gioc-1]) != (tmp_2[num_gioc-2]))){
+            	tmp_5 = tmp_5 + 1;
+            }
+    	}
+    	else if (contatore[k] == (num_gioc-1)){
+            if (((tmp_2[num_gioc-1] + contatore[k] + 1) == (n*k)) && ((tmp_2[num_gioc-1]) != (tmp_2[num_gioc-2]))){
+            	tmp_5 = tmp_5 + 1;
+            	contatore[k] = contatore[k] + 1;
+            }
+    	}
+    }
+
+    while (i < (num_gioc-1)){
+    	while ((tmp_2[j] == tmp_2[j+1]) && (j < num_gioc)){
+    		tmp = tmp + 1;
+    		j = j + 1;
+    	}
+    	for (int k = 1; k < N_COLUMNS; k++){
+    		if (tmp >0){
+        		if ((tmp_2[i] <= (n*k - 1 - contatore[k])) && (tmp_2[i] + contatore[k]) + tmp + 1 >= n*k){
+        			int fi = tmp - (n*k - 1 - tmp_2[i] - contatore[k]);
+        			tmp_5 = tmp_5 + fi;
+        			i = i + tmp;
+        		}
+    		}
+    		else if ((tmp_2[i]-i)%n == 1){
+    			if ((tmp_2[i] + contatore[k]) == n*k){
+    				tmp_5 = tmp_5 + 1;
+    			}
+    			else if ((tmp_2[i]-i)%n == 0){
+    				if ((tmp_2[i] + contatore[k] + 1) == n*k){
+    	            	tmp_5 = tmp_5 + 1;
+    	            	contatore[k] = contatore[k] + 1;
+    				}
+    			}
+    		}
+    	}
+		tmp = 0;
+    	i = i + 1;
+    	j=i;
+    }
+
+    n = n + tmp_5;
 
     for(int i = 0; i < n; i++) {
         for (int j = 0; j < N_COLUMNS; j++) {
@@ -385,38 +468,33 @@ void Game::printTabellone() {
                 continue;
             }
 
-            Casella *casella = this->tabellone.at(pos);
-            Giocatore *giocatoreCorrente = this->giocatori.at(tmp_3);
-
             if (j > 0) {
             	cout << "| ";
             }
 
             if (is_player[j]) {
-            	cout << right << setw(2) << "   " << left << setfill(' ') << setw(W_COLUMN) << giocatoreCorrente->getNome();
+                Giocatore *giocatoreCorrente = this->giocatori.at(tmp_3[j]);
+              	cout << right << setw(2) << "   " << left << setfill(' ') << setw(W_COLUMN) << giocatoreCorrente->getNome();
             	is_player[j] = false;
-            	tmp_3 = tmp_3 + 1;
+                tmp_3[j] = tmp_3[j] + 1;
             }
             else {
+                Casella *casella = this->tabellone.at(pos);
             	cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
             }
 
-            for (int k = tmp_3; ((k < num_gioc) && (is_player[j] == false)); k++){
+            for (int k = tmp_3[j]; ((k < num_gioc) && (is_player[j] == false)); k++){
             	if (gioc_pos[k] == pos){
             		contatore_2[j] = contatore_2[j] + 1;
             		is_player[j] = true;
-            		tmp_3 = k;
+            		tmp_3[j] = k;
+            		tmp_4 = j;
             	}
             }
 
-
-
-            /// Set tmp_3 = 0, perché array giocatori è stato percorso tutto
-            if (tmp_3 == (num_gioc)) {
-            	tmp_3 = 0;
+            if ((tmp_3[j] > 0) && !is_player[tmp_4]){
+            	tmp_3[j] = 0;
             }
-
-//            cout << right << setw(2) << pos << '.' << left << setfill(' ') << setw(W_COLUMN) << casella->getTesto();
 
         }
         cout << endl;
@@ -488,6 +566,7 @@ void Game::pescaCarta_blu() {
     	cout << "Selezione non valida. Inserisci un numero tra 1 e 5" << endl;
     	cin >> opzioneScelta;
     }
+    cout << endl;
     opzioneScelta = (mult*(opzioneScelta - 1) + drift)%5; ///I vettori hanno gli elementi numerati da 0 a 4, gli inserimenti sono da 1 a 5
 
     ///Se risposta corretta giocatore va avanti di 2, se sbagliata -3
@@ -566,9 +645,9 @@ vector<Giocatore *> Game::getGiocatori() {
     return this->giocatori;
 };
 
-//void Game::setGiocatori(vector<Giocatore *> giocatori) {
-//    this->giocatori = move(giocatori);
-//};
+void Game::setGiocatori(vector<Giocatore *> giocatori) {
+    this->giocatori = move(giocatori);
+};
 
 int Game::getGiocatoreCorrente() {
     return this->giocatoreCorrente;
@@ -578,9 +657,9 @@ void Game::setGiocatoreCorrente(int giocatoreCorrente) {
     this->giocatoreCorrente = giocatoreCorrente;
 };
 
-//bool Game::isGameEnded() {
-//    return this->gameEnded;
-//};
+bool Game::isGameEnded() {
+    return this->gameEnded;
+};
 
 void Game::setGameEnded(bool gameEnded) {
     this->gameEnded = gameEnded;

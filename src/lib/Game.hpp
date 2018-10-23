@@ -132,7 +132,7 @@ class Game {
         void setTabellone(vector<Casella *> tabellone);
 
         /// Ritorna l'array che compongono il mazzo
-        vector<Carta> getMazzo();
+        Mazzo* getMazzo();
 
         /// Imposta l'array delle carte che compongono il mazzo
         void setMazzo(Mazzo* pointer);

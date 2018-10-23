@@ -17,8 +17,8 @@ void clearCin();
 /// Aspetta la pressione del tasto invio per continuare
 void pause();
 
-/// Funzione che mette in ordine crescente gli elementi di un array
-/// @param
+/// Funzione che mette in ordine crescente gli elementi di un array intero
+/// @param vettore di interi
 vector<int> sort_int(vector<int> arr);
 
 #endif //GOP_UTILS_HPP

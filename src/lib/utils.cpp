@@ -13,8 +13,8 @@ void clearCin() {
 void pause() {
     cout << "Premere invio per continuare...";
     clearCin();
-    cin.putback('\n');
     cin.get();
+    cin.putback('\n');
 }
 
 
