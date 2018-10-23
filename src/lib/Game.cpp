@@ -429,31 +429,25 @@ void Game::printTabellone() {
     	}
     	for (int k = 1; k < N_COLUMNS; k++){
     		if (tmp >0){
-    			cout << "TEST IF" << endl;
         		if ((gioc_pos_ord[i] <= (n*k - 1 - contatore[k])) && (gioc_pos_ord[i] + contatore[k] + tmp + 1 >= n*k)){
-        			cout << "TEST IF 1.1" << endl;
         			int aumentoRighe_parz = tmp - (n*k - 1 - gioc_pos_ord[i] - contatore[k]);
         			aumentoRighe_tot = aumentoRighe_tot + aumentoRighe_parz;
         			i = i + tmp;
         		}
     		}
     		else {
-    			cout << "TEST ELSE" << endl;
+    			cout << "gioc_pos:" << ((gioc_pos_ord[i]-i)/n) << " k:" << k << endl;
     			if ((gioc_pos_ord[i]-i)/n == k){
-        			cout << "TEST ELSE 1.1" << endl;
-        			if ((gioc_pos_ord[i] + contatore[k]) == n*k){
-        				cout << "TEST ELSE 1.2" << endl;
+        			if ((gioc_pos_ord[i] + contatore[k] + 1) == n*k){
         				aumentoRighe_tot = aumentoRighe_tot + 1;
+    	            	contatore[k] = contatore[k] + 1;
         			}
-        			else if ((gioc_pos_ord[i]-i)/n == k-1){
-        				cout << "TEST ELSE 2" << endl;
-        				if ((gioc_pos_ord[i] + contatore[k] + 1) == n*k){
-        					cout << "TEST ELSE 2.1" << endl;
-        					aumentoRighe_tot = aumentoRighe_tot + 1;
-        	            	contatore[k] = contatore[k] + 1;
-        				}
-        			}
-        		}
+    			}
+    			else if ((gioc_pos_ord[i]-i)/n == k-1){
+    				if ((gioc_pos_ord[i] + contatore[k]) == n*k){
+    					aumentoRighe_tot = aumentoRighe_tot + 1;
+    				}
+    			}
     		}
     	}
 
